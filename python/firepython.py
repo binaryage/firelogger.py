@@ -7,13 +7,13 @@
 #     
 #     import firepython
 # 
-#     # somewhere on the beginning of your response, before any of your logging takes place:
+#     # somewhere at the beginning of your response, before any of your loggings take place:
 #     handler = firepython.FirePythonLogHandler()
 #     root = logging.getLogger()
 #     root.addHandler(handler)
 #     root.setLevel(logging.DEBUG)
 # 
-#     # right before serving your response back to server:
+#     # right before serving your response back to client:
 #     root.removeHandler(handler)
 #     handler.flush(response) # this will add headers into response
 #
@@ -21,7 +21,7 @@
 #
 #  Stay tuned, more docs will hopefully be in the next version.
 #
-#  Any help with this library would be much appreciated, I'm a Python hater. 
+#  Any help with this library would be much appreciated
 #
 #  antonin@hildebrand.cz
 #
