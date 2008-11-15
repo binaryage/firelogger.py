@@ -2,6 +2,9 @@
 // Some code comes from FirePHP project (http://www.firephp.org)
 FBL.ns(function() {
     with(FBL) {
+        const Cc = Components.classes;
+        const Ci = Components.interfaces;
+
         const nsIPrefBranch = Ci.nsIPrefBranch;
         const nsIPrefBranch2 = Ci.nsIPrefBranch2;
 
@@ -60,7 +63,7 @@ FBL.ns(function() {
             /////////////////////////////////////////////////////////////////////////////////////////
             extractHeaders: function(request) {
                 var headers = [];
-                var http = QI(request, nsIHttpChannel);
+                var http = QI(request, Ci.nsIHttpChannel);
                 http.visitResponseHeaders({
                     visitHeader: function(name, value) {
                         headers.push([name, value]);
@@ -185,11 +188,12 @@ FBL.ns(function() {
                 dbg(">>>FirePython.observe: "+topic);
                 Firebug.ActivableModule.observe.apply(this, [subject, topic, data]);
                 if (topic == "http-on-modify-request") {
-                    var httpChannel = subject.QueueryInterface(nsIHttpChannel);
+                    var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
                     // add FirePython/X.X.X to User-Agent header if not already there and firepython is enabled
                     // if firepython is not enabled remove header from request if it exists
-                    if (httpChannel.getRequestHeader("User-Agent").match(/\sFirePython\/([\.|\d]*)\s?/) == null) {
-                        httpChannel.setRequestHeader("User-Agent", httpChannel.getRequestHeader("User-Agent") + ' ' + "FirePython/" + this.version, false);
+                    // why X-FirePython? don't know, see https://developer.mozilla.org/En/Setting_HTTP_request_headers
+                    if (httpChannel.getRequestHeader("User-Agent").match(/\sX-FirePython\/([\.|\d]*)\s?/) == null) {
+                        httpChannel.setRequestHeader("User-Agent", httpChannel.getRequestHeader("User-Agent") + ' ' + "X-FirePython/" + this.version, false);
                     }
                 }
                 if (topic == "nsPref:changed") {
