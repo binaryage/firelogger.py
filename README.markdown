@@ -64,7 +64,7 @@ The support [forum is here][support].
 History
 -------
 
-* 0.1 (to be released) 
+* 0.1 (15.11.2008) 
   * public alpha release
   * initial server-side support for Python and Google App Engine
   * communication via response headers
