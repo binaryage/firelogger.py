@@ -76,7 +76,7 @@ History
 [screenshot]: http://github.com/woid/firepython/tree/master/support/screenshot.png?raw=true "FirePython in action"
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
-[firepython]: https://addons.mozilla.org/en-US/firefox/addon/TODO
+[firepython]: https://addons.mozilla.org/en-US/firefox/addon/9602
 [homepage]: http://github.com/woid/firepython
 [contact]: mailto:antonin@hildebrand.cz
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
