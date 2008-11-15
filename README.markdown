@@ -26,22 +26,23 @@ Usage:
 
   Depends on simplejson!
  
-  Usage:
-      in all handlers where you want to capture logging ...
-      
-      import firepython
+  Usage: in all wsgi handlers where you want to capture logging ...
+<code class="python">      
+
+    import firepython
+
+    # somewhere at the beginning of your response, before any of your loggings take place:
+    handler = firepython.FirePythonLogHandler()
+    root = logging.getLogger()
+    root.addHandler(handler)
+    root.setLevel(logging.DEBUG)
   
-      # somewhere at the beginning of your response, before any of your loggings take place:
-      handler = firepython.FirePythonLogHandler()
-      root = logging.getLogger()
-      root.addHandler(handler)
-      root.setLevel(logging.DEBUG)
-      
-      # ...
-  
-      # right before serving your response back to client:
-      root.removeHandler(handler)
-      handler.flush(response)   this will add headers into response
+    # ... your handle code here
+
+    # right before serving your response back to client:
+    root.removeHandler(handler)
+    handler.flush(response)   # this will add headers into response
+</code>
 
 
 Current State
