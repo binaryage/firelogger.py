@@ -18,8 +18,7 @@ FBL.ns(function() {
         const firepythonPrefDomain = "extensions.firepython";
         var firepythonOptionUpdateMap = {};
 
-        if (Firebug.TraceModule)
-        {
+        if (Firebug.TraceModule) {
             Firebug.TraceModule.DBG_FIREPYTHON = false;
             var type = firepythonPrefs.getPrefType('extensions.firebug.DBG_FIREPYTHON');
             if (type != nsIPrefBranch.PREF_BOOL) try {
@@ -272,6 +271,9 @@ FBL.ns(function() {
             reattachContext: function(browser, context) {
                 dbg(">>>FirePython.reattachContext");
                 Firebug.ActivableModule.reattachContext.apply(this, arguments);
+                var panel = context.getPanel("FirePython");
+                if (!panel) return;
+                panel.applyCSS();
             },
             /////////////////////////////////////////////////////////////////////////////////////////
             loadedContext: function(context) {
@@ -695,6 +697,7 @@ FBL.ns(function() {
             applyCSS: function() {
                 dbg(">>>FirePythonPanel.applyCSS");
                 this.applyPanelCSS("chrome://firepython/skin/panel.css");
+                this.applyPanelCSS("chrome://firepython/skin/panel.css");
             },
             /////////////////////////////////////////////////////////////////////////////////////////
             safeGetURI: function(browser) {
@@ -809,6 +812,11 @@ FBL.ns(function() {
             },
             /////////////////////////////////////////////////////////////////////////////////////////
             applyPanelCSS: function(url) {
+                var links = FBL.getElementsBySelector(this.document, "link");
+                for (var i=0; i < links.length; i++) {
+                    var link = links[i];
+                    if (link.getAttribute('href')==url) return; // already applied
+                }
                 var styleElement = this.document.createElement("link");
                 styleElement.setAttribute("type", "text/css");
                 styleElement.setAttribute("href", url);
