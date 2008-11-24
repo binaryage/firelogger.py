@@ -1,68 +1,95 @@
-FirePython
-==========
+# FirePython
 
-FirePython is a sexy python logger console integrated into [Firebug 1.3][firebug].
+FirePython is a sexy Python logger console integrated into [Firebug 1.3][firebug]. 
 
-Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine]. 
+<font size="2">Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].</font>
 
 ![screenshot][screenshot]
 
-Prerequisites
--------------
+## Prerequisites
 
 You definitely need [Firebug 1.3][firebug].
 
-Installation
-------------
+## Installation
 
+### Firefox Addon
 Preferred way is to install this firefox extension via addons.mozilla.com.
 The latest version is [available here][firepython].
 
-Some people have reported they are unable to download and install extension via addons.mozilla.com. 
-In this case you may [try workaround][workaround].
+<font size="2" color="grey">Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
+In this case you may [try workaround][workaround].</font>
 
-Usage:
-------
+### Python Library
 
-  Depends on simplejson!
- 
-  Usage: in all wsgi handlers where you want to capture logging ...
-<code class="python">      
+#### The easy way:
+
+``sudo easy_install firepython``
+
+#### The manual way:
+
+Clone [project from github][homepage] and copy folder [python/firepython][firepython-folder] in your project directory.
+Or alternatively you may want to add folder [python][python-folder] into your ``sys.path``.
+
+It depends on simplejson!
+
+## Usage:
+
+### Django
+
+After installation, enable middleware by adding its path in ``MIDDLEWARE_CLASSES``: ``firepython.django.FirePythonDjango``. 
+
+### WSGI compatible
+
+After installation, enable middleware ``firepython.wsgi.FirePythonWSGI``.
+
+### Custom usage
+
+In all places where you want to capture logging ...
+
+<code>
 
     import firepython
 
     # somewhere at the beginning of your response, before any of your loggings take place:
     handler = firepython.FirePythonLogHandler()
-    root = logging.getLogger()
-    root.addHandler(handler)
-    root.setLevel(logging.DEBUG)
+    logger = logging.getLogger()
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
   
-    # ... your handle code here
+    # ... your handler code here
 
     # right before serving your response back to client:
-    root.removeHandler(handler)
-    handler.flush(response)   # this will add headers into response
+    logger.removeHandler(handler)
+    handler.flush(response.add_header)   # this will add headers into response
 </code>
 
 
-Current State
--------------
+
+# Current State
 
 Version 0.1 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
 
-Contributors
-------------
+# Contributors
 
-* **Firebug team** - without these guys web wouldn't look like today.
-* **FirePHP authors** - a lot of inspiration, good work mates!
+* **[Alexander Solovyov][alexander]** - Django and WSGI middlewares
+* **[Firebug team][firebug-team]** - without these guys web wouldn't look like today.
+* **[FirePHP authors][firephp-authors]** - a lot of inspiration, good work mates!
 
-Support
--------
+
+# Support
 
 The support [forum is here][support].
 
-History
--------
+# Articles
+
+* [FirePython — no prints?][firepython-no-prints] (by Alexander Solovyov)
+
+# History
+
+* 0.2 (24.11.2008)
+  * Django and WSGI middlewares by Alexander Solovyov
+  * added as firepython package to PyPI index
+  * fixed FirePython panel styles when Firebug window was detached from main window
 
 * 0.1 (15.11.2008) 
   * public alpha release
@@ -81,5 +108,11 @@ History
 [contact]: mailto:antonin@hildebrand.cz
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
 [support]: http://firepython.uservoice.com/
+[firepython-no-prints]:http://blogg.ingspree.net/blog/2008/11/24/firepython-no-prints/
+[alexander]:http://github.com/piranha
+[python-folder]:http://github.com/woid/firepython/tree/master/python
+[firepython-folder]:http://github.com/woid/firepython/tree/master/python/firepython
+[firebug-team]:http://getfirebug.com/workingGroup
+[firephp-authors]:http://www.christophdorn.com/
 
 <script src="http://firepython.uservoice.com/pages/general/widgets/tab.js?alignment=right&amp;color=00BCBA" type="text/javascript"></script>
