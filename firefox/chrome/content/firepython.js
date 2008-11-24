@@ -13,7 +13,7 @@ FBL.ns(function() {
 
         const firepythonPrefs = firepythonPrefService.getService(nsIPrefBranch2);
         const firepythonURLs = {
-            main: "http://github.com/woid/firepython",
+            main: "http://github.com/woid/firepython"
         };
         const firepythonPrefDomain = "extensions.firepython";
         var firepythonOptionUpdateMap = {};
@@ -38,12 +38,10 @@ FBL.ns(function() {
             return s.charAt(0).toUpperCase() + s.substring(1).toLowerCase();
         }
         
-        FBL.$FIREPYTHON_STR = function(name)
-        {
+        FBL.$FIREPYTHON_STR = function(name) {
             return document.getElementById("strings_firepython").getString(name);
         };
-        FBL.$FIREPYTHON_STRF = function(name, args)
-        {
+        FBL.$FIREPYTHON_STRF = function(name, args) {
             return document.getElementById("strings_firepython").getFormattedString(name, args);
         };
     
@@ -106,7 +104,7 @@ FBL.ns(function() {
                     if (re.test(name)) { 
                         buffer+=value;
                     }
-                }
+                };
                 for (var index in headers) {
                     parseHeader(headers[index].name, headers[index].value);
                 }
@@ -424,7 +422,7 @@ FBL.ns(function() {
                 //     }
                 // }
                 var editor = {
-                    executable: "/bin/mate",
+                    executable: "/bin/mate"
                 };
                 var args= ["-l", line, path];
                 dbg(">>>Lauching "+editor.executable, args);
@@ -516,7 +514,7 @@ FBL.ns(function() {
                     blockVisible: true,
                     sessionVisible: false,
                     allowVisible: true,
-                    prefilledHost: host,
+                    prefilledHost: host
                 };
     
                 openWindow("Browser:Permissions", "chrome://browser/content/preferences/permissions.xul", "", params);
