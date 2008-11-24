@@ -3,3 +3,5 @@ tmp
 build
 Thumbs.db
 *.pyc
+python/dist
+python/firepython.egg-info

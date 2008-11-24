@@ -20,6 +20,7 @@ ROOT = File.expand_path('.')
 SRC = File.join(ROOT, 'firefox')
 DST = File.join(ROOT, 'build')
 TMP = File.join(ROOT, 'tmp')
+PYTHON = File.join(ROOT, 'python')
 
 # http://kpumuk.info/ruby-on-rails/colorizing-console-ruby-script-output/
 begin
@@ -98,6 +99,7 @@ end
 
 ################################################################################
 
+desc "Prepare XPI"
 task :default do
   version = parse_version()
 
@@ -118,4 +120,12 @@ task :default do
   puts red('need zip on command line (download http://www.info-zip.org/Zip.html)') unless system("zip -r \"#{res}\" *");
   Dir.chdir(owd)
   remove_dir(TMP) if File.exist?(TMP) # recursive!
+end
+
+desc "Update PyPI index and upload library sources"
+task :pypi do
+  Dir.chdir(PYTHON) do
+    system("python setup.py register") or die("register failed")
+    system("python setup.py sdist upload") or die("upload failed")
+  end 
 end
