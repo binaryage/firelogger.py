@@ -1,23 +1,23 @@
 # FirePython server-side suport
 #
 # Depends on simplejson!
-# 
+#
 # Usage:
 #     in all handlers where you want to capture logging ...
-#     
+#
 #     import firepython
-# 
+#
 #     # somewhere at the beginning of your response, before any of your loggings take place:
 #     handler = firepython.FirePythonLogHandler()
 #     root = logging.getLogger()
 #     root.addHandler(handler)
 #     root.setLevel(logging.DEBUG)
-# 
+#
 #     # right before serving your response back to client:
 #     root.removeHandler(handler)
 #     handler.flush(response) # this will add headers into response
 #
-#  ---- 
+#  ----
 #
 #  Stay tuned, more docs will hopefully be in the next version.
 #
@@ -59,19 +59,19 @@ def firepython_json_encode(data, **kwargs):
         else:
             ret = data
         return ret
-    
+
     def _list(data):
         ret = []
         for v in data:
             ret.append(_any(v))
         return ret
-    
+
     def _dict(data):
         ret = {}
         for k,v in data.items():
             ret[k] = _any(v)
         return ret
-    
+
     ret = _any(data)
     return simplejson.dumps(ret, cls=TolerantJSONEncoder)
 
@@ -84,7 +84,7 @@ class FirePythonLogHandler(logging.Handler):
 
     def emit(self, record):
         self.queue.append(self._prepare_log_record(record))
-        
+
     def _prepare_log_record(self, record):
         data = {
             "level": self._log_level(record.levelno),
@@ -99,7 +99,7 @@ class FirePythonLogHandler(logging.Handler):
             except:
                 pass
         return data
-  
+
     def _log_level(self, level):
         if level >= logging.CRITICAL:
             return "critical"
@@ -118,7 +118,7 @@ class FirePythonLogHandler(logging.Handler):
         data = base64.encodestring(data)
         chunks = data.split("\n")
         return chunks
-            
+
     def flush(self, response):
         if len(self.queue)==0: return
         data = {
