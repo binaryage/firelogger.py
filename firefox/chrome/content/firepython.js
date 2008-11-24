@@ -97,18 +97,17 @@ FBL.ns(function() {
             },
             /////////////////////////////////////////////////////////////////////////////////////////
             parseHeaders: function(headers) {
-                var buffer = "";
-                var re = /^firepython/;
+                var buffer = [];
+                var re = /^firepython-(\d+)/i;
                 var parseHeader = function(name, value) {
-                    name = name.toLowerCase();
-                    if (re.test(name)) { 
-                        buffer+=value;
-                    }
+                    var res = re.exec(name);
+                    if (res) buffer[res[1]]=value;
                 };
                 for (var index in headers) {
                     parseHeader(headers[index].name, headers[index].value);
                 }
                 // we use UTF-8 encoded JSON to exchange messages which are wrapped with base64
+                buffer = buffer.join('');
                 buffer = Base64.decode(buffer);
                 buffer = UTF8.decode(buffer);
                 var packet = JSON.parse(buffer);
