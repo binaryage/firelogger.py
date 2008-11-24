@@ -130,35 +130,3 @@ class FirePythonLogHandler(logging.Handler):
             i = i + 1
             response.headers.add_header('FirePython-%d' % i, c)
         self.queue = []
-
-### Application helpers
-
-class WSGILikeDjangoHeaders(object):
-    """
-    Support class for Django's HttpResponse to mimic WSGI response behavior.
-    """
-    def __init__(self, response):
-        self.response = response
-
-    def add_header(self, name, value):
-        self.response[name] = value
-
-class FirePythonDjango(object):
-    """
-    Django middleware to enable FirePython logging.
-
-    Add it to your MIDDLEWARE_CLASSES setting.
-    """
-    def __init__(self):
-        self.handler = FirePythonLogHandler()
-        self.root = logging.getLogger()
-
-    def process_request(self, request):
-        self.root.addHandler(self.handler)
-        self.root.setLevel(logging.DEBUG)
-
-    def process_response(self, request, response):
-        self.root.removeHandler(self.handler)
-        response.headers = WSGILikeDjangoHeaders(response)
-        self.handler.flush(response)
-        return response
