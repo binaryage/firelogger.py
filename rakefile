@@ -102,7 +102,7 @@ task :default do
   version = parse_version()
 
   remove_dir(TMP) if File.exists?(TMP) # recursive!
-  mkdir(TMP)
+  mkdir(TMP, {:verbose => false})
   cp_dir(File.join(SRC, 'chrome'), File.join(TMP, "chrome"))
   cp_dir(File.join(SRC, 'defaults'), File.join(TMP, "defaults"))
   dep(File.join(SRC, 'chrome.manifest'))
