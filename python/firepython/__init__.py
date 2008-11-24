@@ -119,7 +119,13 @@ class FirePythonLogHandler(logging.Handler):
         chunks = data.split("\n")
         return chunks
 
-    def flush(self, response):
+    def flush(self, add_header):
+        """
+        Flush collected logs in response.
+
+        Argument ``add_header`` should be a function receiving two arguments:
+        ``name`` and ``value`` of header.
+        """
         if len(self.queue)==0: return
         data = {
             "logs": self.queue,
@@ -128,5 +134,5 @@ class FirePythonLogHandler(logging.Handler):
         i = 0
         for c in chunks:
             i = i + 1
-            response.headers.add_header('FirePython-%d' % i, c)
+            add_header('FirePython-%d' % i, c)
         self.queue = []
