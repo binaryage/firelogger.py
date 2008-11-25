@@ -23,7 +23,7 @@ logging.currentframe = correctCurrentframe
 # TODO: make JSON encoder smart to encode "unknown" structures by sniffing using reflection
 class TolerantJSONEncoder(simplejson.JSONEncoder):
     def default(self, o):
-        return str(o);
+        return str(o)
         #return super(DateTimeAwareJSONEncoder, self).default(o)
 
 def firepython_json_encode(data, **kwargs):
@@ -54,8 +54,8 @@ def firepython_json_encode(data, **kwargs):
 
 class FirePythonLogHandler(logging.Handler):
 
-    def __init__(self, *arguments, **keywords):
-        logging.Handler.__init__(self, *arguments, **keywords)
+    def __init__(self, *args, **kwargs):
+        super(FirePythonLogHandler, self).__init__(*args, **kwargs)
         self.queue = []
         self._start_time = time.time()
 
@@ -67,13 +67,14 @@ class FirePythonLogHandler(logging.Handler):
             "level": self._log_level(record.levelno),
             "message": self.format(record),
             "timestamp": long(record.created * 1000 * 1000),
-            "time": time.strftime("%H:%M:%S", time.localtime(record.created))+(".%03d" % ((record.created - long(record.created)) * 1000))
+            "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
+                     (".%03d" % ((record.created - long(record.created)) * 1000)))
         }
         props = ["args", "pathname", "lineno", "exc_info", "exc_text", "name", "process", "thread", "threadName"]
         for p in props:
             try:
-                data[p] = record.__dict__[p]
-            except:
+                data[p] = getattr(record, p)
+            except AttributeError:
                 pass
         return data
 
@@ -93,8 +94,7 @@ class FirePythonLogHandler(logging.Handler):
         data = firepython_json_encode(data)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
-        chunks = data.split("\n")
-        return chunks
+        return data.splitlines()
 
     def flush(self, add_header):
         """
@@ -103,13 +103,9 @@ class FirePythonLogHandler(logging.Handler):
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
         """
-        if len(self.queue)==0: return
-        data = {
-            "logs": self.queue,
-        }
-        chunks = self._encode(data)
-        i = 0
-        for c in chunks:
-            i = i + 1
-            add_header('FirePython-%d' % i, c)
+        if not self.queue:
+            return
+        chunks = self._encode({"logs": self.queue})
+        for i, chunk in enumerate(chunks):
+            add_header('FirePython-%d' % i, chunk)
         self.queue = []
