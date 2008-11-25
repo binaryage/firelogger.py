@@ -13,6 +13,11 @@ import traceback
 import re
 import threading
 
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import md5
+
 __version__ = '0.2'
 
 def correctCurrentframe():
