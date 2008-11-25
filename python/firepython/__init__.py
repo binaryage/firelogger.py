@@ -13,6 +13,11 @@ import traceback
 import re
 import threading
 
+try:
+    from hashlib import md5
+except ImportError:
+    from md5 import md5
+
 __version__ = '0.2'
 
 def correctCurrentframe():
@@ -109,7 +114,7 @@ class FirePythonLogHandler(logging.Handler):
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
         """
-        if not getattr(self.local, 'queue', None):
+        if getattr(self.local, 'queue', None) is None:
             return
         chunks = self._encode({"logs": self.local.queue})
         for i, chunk in enumerate(chunks):
