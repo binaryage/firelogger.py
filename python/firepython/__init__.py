@@ -109,7 +109,7 @@ class FirePythonLogHandler(logging.Handler):
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
         """
-        if not self.local.queue:
+        if not getattr(self.local, 'queue', None):
             return
         chunks = self._encode({"logs": self.local.queue})
         for i, chunk in enumerate(chunks):
@@ -134,6 +134,7 @@ def install_handler(logger, handler, user_agent, password, auth):
                       (version, __version__))
 
 def remove_handler(logger, handler, add_header):
-    logger.removeHandler(handler)
-    handler.flush(add_header)
+    if handler in logger.handlers:
+        logger.removeHandler(handler)
+        handler.flush(add_header)
 
