@@ -11,6 +11,7 @@ import base64
 import time
 import traceback
 import re
+import threading
 
 __version__ = '0.2'
 
@@ -59,11 +60,13 @@ class FirePythonLogHandler(logging.Handler):
 
     def __init__(self, *args, **kwargs):
         logging.Handler.__init__(self, *args, **kwargs)
-        self.queue = []
+        self.local = threading.local()
         self._start_time = time.time()
 
     def emit(self, record):
-        self.queue.append(self._prepare_log_record(record))
+        if not hasattr(self.local, 'queue'):
+            self.local.queue = []
+        self.local.queue.append(self._prepare_log_record(record))
 
     def _prepare_log_record(self, record):
         data = {
@@ -106,12 +109,12 @@ class FirePythonLogHandler(logging.Handler):
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
         """
-        if not self.queue:
+        if not self.local.queue:
             return
-        chunks = self._encode({"logs": self.queue})
+        chunks = self._encode({"logs": self.local.queue})
         for i, chunk in enumerate(chunks):
             add_header('FirePython-%d' % i, chunk)
-        self.queue = []
+        self.local.queue = []
 
 
 FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
