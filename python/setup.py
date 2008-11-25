@@ -3,8 +3,10 @@
 
 from distutils.core import setup
 
+from firepython import __version__
+
 setup(name='firepython',
-      version='0.2',
+      version=__version__,
       description='Python logging to Firebug',
       author='Antonin Hildebrand',
       author_email='antonin@hildebrand.cz',
