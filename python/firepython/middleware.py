@@ -21,7 +21,7 @@ class FirePythonDjango(object):
     def process_request(self, request):
         firepython.install_handler(
             self.root, self.handler, request.META['HTTP_USER_AGENT'],
-            self.password, request.META.get('X-FirePythonAuth', ''))
+            self.password, request.META.get('HTTP_X_FIREPYTHONAUTH', ''))
 
     def process_response(self, request, response):
         firepython.remove_handler(self.root, self.handler,
@@ -45,7 +45,7 @@ class FirePythonWSGI(object):
     def __call__(self, environ, start_response):
         firepython.install_handler(
             self.root, self.handler, environ['HTTP_USER_AGENT'],
-            self.password, environ.get('X-FirePythonAuth', ''))
+            self.password, environ.get('HTTP_X_FIREPYTHONAUTH', ''))
 
         # collect headers
         resp_info = []
