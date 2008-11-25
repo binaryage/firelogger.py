@@ -10,6 +10,7 @@
   <script type="application/x-javascript" src="chrome://firepython/content/firepython.js"/>
   <commandset id="mainCommandSet">
     <command id="cmd_FirePythonSite" oncommand="Firebug.FirePython.onVisitWebsite('main')"/>
+    <command id="cmd_FirePythonClear" oncommand="Firebug.FirePython.onClear()"/>
     <command id="cmd_FirePythonFilterDebug" oncommand="Firebug.FirePython.onFilterLogs('debug')"/>
     <command id="cmd_FirePythonFilterInfo" oncommand="Firebug.FirePython.onFilterLogs('info')"/>
     <command id="cmd_FirePythonFilterWarning" oncommand="Firebug.FirePython.onFilterLogs('warning')"/>
@@ -33,6 +34,7 @@
             <menuitem label="FirePython Website..." command="cmd_FirePythonSite"/>
           </menupopup>
         </toolbarbutton>
+        <toolbarbutton label="Clear" class="toolbar-text-button" command="cmd_FirePythonClear" tooltiptext="Click to clear FirePython console"/>
       </hbox>
     </hbox>
   </toolbar>

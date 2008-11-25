@@ -500,6 +500,12 @@ FBL.ns(function() {
                 this.storeFilterStates(states);
             },
             /////////////////////////////////////////////////////////////////////////////////////////
+            onClear: function() {
+                dbg(">>>FirePython.onClear");
+                if (!this.currentPanel) return;
+                this.currentPanel.clear();
+            },
+            /////////////////////////////////////////////////////////////////////////////////////////
             openPermissions: function(event, context) {
                 cancelEvent(event);
     
