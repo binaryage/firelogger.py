@@ -13,8 +13,8 @@ class FirePythonWSGI(object):
         self.root = logging.getLogger()
 
     def __call__(self, environ, start_response):
-        self.root.addHandler(self.handler)
-        self.root.setLevel(logging.DEBUG)
+        firepython.install_handler(self.root, self.handler,
+                                   environ['HTTP_USER_AGENT'])
 
         # collect headers
         resp_info = []
@@ -30,8 +30,8 @@ class FirePythonWSGI(object):
         # collect logs
         def add_header(name, value):
             resp_info[1].append((name, value))
-        self.root.removeHandler(self.handler)
-        self.handler.flush(add_header)
+
+        firepython.remove_handler(self.root, self.handler, add_header)
 
         # start responding
         start_response(*resp_info)

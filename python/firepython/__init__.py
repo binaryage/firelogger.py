@@ -10,6 +10,9 @@ import logging
 import base64
 import time
 import traceback
+import re
+
+__version__ = '0.2'
 
 def correctCurrentframe():
     try:
@@ -55,7 +58,7 @@ def firepython_json_encode(data, **kwargs):
 class FirePythonLogHandler(logging.Handler):
 
     def __init__(self, *args, **kwargs):
-        super(FirePythonLogHandler, self).__init__(*args, **kwargs)
+        logging.Handler.__init__(self, *args, **kwargs)
         self.queue = []
         self._start_time = time.time()
 
@@ -109,3 +112,22 @@ class FirePythonLogHandler(logging.Handler):
         for i, chunk in enumerate(chunks):
             add_header('FirePython-%d' % i, chunk)
         self.queue = []
+
+
+FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
+
+def install_handler(logger, handler, user_agent):
+    check = FIREPYTHON_UA.search(user_agent)
+    if not check:
+        return
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
+    version = check.group('ver')
+    if version != __version__:
+        logging.debug('FireBug part of FirePython is version %s, but Python part is %s' %
+                      (version, __version__))
+
+def remove_handler(logger, handler, add_header):
+    logger.removeHandler(handler)
+    handler.flush(add_header)
+
