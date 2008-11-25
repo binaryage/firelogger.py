@@ -25,6 +25,7 @@ class FirePythonWSGI(object):
 
         # run app
         app_iter = self.app(environ, faked_start_response)
+        output = list(app_iter)
 
         # collect logs
         def add_header(name, value):
@@ -34,4 +35,4 @@ class FirePythonWSGI(object):
 
         # start responding
         start_response(*resp_info)
-        return app_iter
+        return output
