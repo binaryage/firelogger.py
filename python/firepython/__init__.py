@@ -109,7 +109,7 @@ class FirePythonLogHandler(logging.Handler):
 
     def flush(self, add_header=None):
         """
-        Flush collected logs in response.
+        Flush collected logs into response.
 
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
@@ -119,6 +119,7 @@ class FirePythonLogHandler(logging.Handler):
         if add_header is None: # flush() is called at program end
             if len(self.local.queue)>0:
                 logging.warning('FirePython flush called without add_header routine, output of %d log records will be lost', len(self.local.queue))
+                self.local.queue = []
             return
         chunks = self._encode({"logs": self.local.queue})
         for i, chunk in enumerate(chunks):
