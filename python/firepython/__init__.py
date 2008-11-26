@@ -37,33 +37,6 @@ logging.currentframe = correctCurrentframe
 class TolerantJSONEncoder(simplejson.JSONEncoder):
     def default(self, o):
         return str(o)
-        #return super(DateTimeAwareJSONEncoder, self).default(o)
-
-def firepython_json_encode(data, **kwargs):
-    def _any(data):
-        ret = None
-        if type(data) is types.ListType:
-            ret = _list(data)
-        elif type(data) is types.DictType:
-            ret = _dict(data)
-        else:
-            ret = data
-        return ret
-
-    def _list(data):
-        ret = []
-        for v in data:
-            ret.append(_any(v))
-        return ret
-
-    def _dict(data):
-        ret = {}
-        for k,v in data.items():
-            ret[k] = _any(v)
-        return ret
-
-    ret = _any(data)
-    return simplejson.dumps(ret, cls=TolerantJSONEncoder)
 
 class FirePythonLogHandler(logging.Handler):
 
@@ -106,7 +79,7 @@ class FirePythonLogHandler(logging.Handler):
             return "debug"
 
     def _encode(self, data):
-        data = firepython_json_encode(data)
+        data = simplejson.dumps(data, cls=TolerantJSONEncoder)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
