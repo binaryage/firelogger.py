@@ -7,6 +7,7 @@
   <script type="application/x-javascript" src="chrome://firepython/content/lib/utf8.js"/>
   <script type="application/x-javascript" src="chrome://firepython/content/lib/json.js"/>
   <script type="application/x-javascript" src="chrome://firepython/content/lib/base64.js"/>
+  <script type="application/x-javascript" src="chrome://firepython/content/lib/md5.js"/>
   <script type="application/x-javascript" src="chrome://firepython/content/firepython.js"/>
   <commandset id="mainCommandSet">
     <command id="cmd_FirePythonPreferences" oncommand="Firebug.FirePython.onPreferences()"/>
