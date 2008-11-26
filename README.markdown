@@ -2,7 +2,7 @@
 
 FirePython is a sexy Python logger console integrated into [Firebug 1.3][firebug]. 
 
-<font size="2">Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].</font>
+Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].
 
 ![screenshot][screenshot]
 
@@ -16,8 +16,8 @@ You definitely need [Firebug 1.3][firebug].
 Preferred way is to install this firefox extension via addons.mozilla.com.
 The latest version is [available here][firepython].
 
-<font size="2" color="grey">Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
-In this case you may [try workaround][workaround].</font>
+Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
+In this case you may [try workaround][workaround].
 
 ### Python Library
 
@@ -36,11 +36,11 @@ It depends on simplejson!
 
 ### Django
 
-After installation, enable middleware by adding its path in ``MIDDLEWARE_CLASSES``: ``firepython.django.FirePythonDjango``. 
+After installation, enable middleware by adding its path in ``MIDDLEWARE_CLASSES``: ``firepython.middleware.FirePythonDjango``. 
 
 ### WSGI compatible
 
-After installation, enable middleware ``firepython.wsgi.FirePythonWSGI``.
+After installation, enable middleware ``firepython.middleware.FirePythonWSGI``.
 
 ### Custom usage
 
@@ -63,18 +63,19 @@ In all places where you want to capture logging ...
     handler.flush(response.add_header)   # this will add headers into response
 </code>
 
-
-
 # Current State
 
-Version 0.1 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
+Version 0.2 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
 
 # Contributors
 
-* **[Alexander Solovyov][alexander]** - Django and WSGI middlewares
-* **[Firebug team][firebug-team]** - without these guys web wouldn't look like today.
-* **[FirePHP authors][firephp-authors]** - a lot of inspiration, good work mates!
+* **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
+* **[Ivan Fedorov][ivan]** - helping out with threading issues.
 
+### Also thanks to
+
+* **[Firebug team][firebug-team]** - without these guys the web wouldn't look like today.
+* **[FirePHP authors][firephp-authors]** - a lot of inspiration, good work mates!
 
 # Support
 
@@ -85,6 +86,11 @@ The support [forum is here][support].
 * [FirePython — no prints?][firepython-no-prints] (by Alexander Solovyov)
 
 # History
+
+* 0.3 (to be released)
+  * password protection for production site
+  * thread-safety
+  * improved API
 
 * 0.2 (24.11.2008)
   * Django and WSGI middlewares by Alexander Solovyov
@@ -109,10 +115,9 @@ The support [forum is here][support].
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
 [support]: http://firepython.uservoice.com/
 [firepython-no-prints]:http://blogg.ingspree.net/blog/2008/11/24/firepython-no-prints/
-[alexander]:http://github.com/piranha
 [python-folder]:http://github.com/woid/firepython/tree/master/python
 [firepython-folder]:http://github.com/woid/firepython/tree/master/python/firepython
+[alexander]:http://github.com/piranha
+[ivan]:http://github.com/oxyum
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
-
-<script src="http://firepython.uservoice.com/pages/general/widgets/tab.js?alignment=right&amp;color=00BCBA" type="text/javascript"></script>

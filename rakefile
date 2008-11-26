@@ -17,7 +17,7 @@
 #10. >rake
 
 ROOT = File.expand_path('.')
-SRC = File.join(ROOT, 'firefox')
+FIREFOX = File.join(ROOT, 'firefox')
 DST = File.join(ROOT, 'build')
 TMP = File.join(ROOT, 'tmp')
 PYTHON = File.join(ROOT, 'python')
@@ -75,7 +75,7 @@ end
 
 def dep(src)
   s = File.expand_path src
-  rs = s[SRC.size..-1]
+  rs = s[FIREFOX.size..-1]
   d = File.join(TMP, rs)
   puts "#{cmd_color('copying')} #{file_color(s)}"
   puts "     -> #{file_color(d)}"
@@ -88,13 +88,34 @@ def my_mkdir(dir)
 end
 
 def parse_version()
-  f = File.new(File.join(SRC, 'install.rdf'))
+  f = File.new(File.join(FIREFOX, 'install.rdf'))
   text = f.read
   unless text=~/<em:version>([^<]*)<\/em:version>/
     puts "#{red('Version not found')}"
     exit
   end
   $1
+end
+
+def die(s)
+  puts(red(s))
+  exit(1)
+end
+
+def patch(filepath, matcher, replacer)
+  puts "Patching #{blue(filepath[ROOT.size+1..-1])} with #{yellow(replacer.to_s)}"
+  applied = false
+  lines = []
+  File.open(filepath, 'r') do |f|
+    f.each do |line|
+      lines << line.gsub(matcher, replacer)
+      applied ||= lines[-1]!=line
+    end
+  end
+  File.open(filepath, "w") do |f|
+    f << lines
+  end
+  applied
 end
 
 ################################################################################
@@ -105,11 +126,11 @@ task :default do
 
   remove_dir(TMP) if File.exists?(TMP) # recursive!
   mkdir(TMP, {:verbose => false})
-  cp_dir(File.join(SRC, 'chrome'), File.join(TMP, "chrome"))
-  cp_dir(File.join(SRC, 'defaults'), File.join(TMP, "defaults"))
-  dep(File.join(SRC, 'chrome.manifest'))
-  dep(File.join(SRC, 'install.rdf'))
-  dep(File.join(SRC, 'license.txt'))
+  cp_dir(File.join(FIREFOX, 'chrome'), File.join(TMP, "chrome"))
+  cp_dir(File.join(FIREFOX, 'defaults'), File.join(TMP, "defaults"))
+  dep(File.join(FIREFOX, 'chrome.manifest'))
+  dep(File.join(FIREFOX, 'install.rdf'))
+  dep(File.join(FIREFOX, 'license.txt'))
   my_mkdir(DST) unless File.exist?(DST)
 
   res = "#{DST}/firepython-#{version}.xpi"
@@ -128,4 +149,22 @@ task :pypi do
     system("python setup.py register") or die("register failed")
     system("python setup.py sdist upload") or die("upload failed")
   end 
+end
+
+desc "Resets version in all relevant sources"
+task :version do
+  version = ARGV[1] or die("Please specify a version as first parameter")
+  firepython_js_path = File.join(FIREFOX, 'chrome', 'content', 'firepython.js')
+  if not patch(firepython_js_path, /version: '([0-9\.])+'/, "version: '#{version}'")
+    puts "  #{red("patching had no effect")}"
+  end
+  init_py_path = File.join(PYTHON, 'firepython', '__init__.py')
+  if not patch(init_py_path, /__version__ = '([0-9\.])+'/, "__version__ = '#{version}'")
+    puts "  #{red("patching had no effect")}"
+  end
+  install_rdf_path = File.join(FIREFOX, 'install.rdf')
+  if not patch(install_rdf_path, /<em:version>([0-9\.])+<\/em:version>/, "<em:version>#{version}</em:version>")
+    puts "  #{red("patching had no effect")}"
+  end
+  exit(0)
 end
