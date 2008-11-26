@@ -131,7 +131,7 @@ def install_handler(logger, handler, user_agent, password, auth):
     if not check:
         return
     if (password and
-        md5.new('#FirePythonPassword#%s#' % password).hexdigest() != auth):
+        md5('#FirePythonPassword#%s#' % password).hexdigest() != auth):
         return
     logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
