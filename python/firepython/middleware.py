@@ -129,6 +129,10 @@ class FirePythonDjango(FirePythonBase):
         self._flush_records(response.__setitem__)
         return response
 
+    def process_exception(self, request, exception):
+        logging.exception(exception)
+
+
 class FirePythonWSGI(FirePythonBase):
     """
     WSGI middleware to enable FirePython logging.
@@ -149,8 +153,12 @@ class FirePythonWSGI(FirePythonBase):
             resp_info.append(exc_info)
 
         # run app
-        app_iter = self._app(environ, faked_start_response)
-        output = list(app_iter)
+        try:
+            app_iter = self._app(environ, faked_start_response)
+            output = list(app_iter)
+        except Exception, e:
+            logging.exception(e)
+            raise
 
         # collect logs
         def add_header(name, value):
