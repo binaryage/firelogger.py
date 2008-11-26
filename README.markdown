@@ -36,11 +36,11 @@ It depends on simplejson!
 
 ### Django
 
-After installation, enable middleware by adding its path in ``MIDDLEWARE_CLASSES``: ``firepython.django.FirePythonDjango``. 
+After installation, enable middleware by adding its path in ``MIDDLEWARE_CLASSES``: ``firepython.middleware.FirePythonDjango``. 
 
 ### WSGI compatible
 
-After installation, enable middleware ``firepython.wsgi.FirePythonWSGI``.
+After installation, enable middleware ``firepython.middleware.FirePythonWSGI``.
 
 ### Custom usage
 
