@@ -1,8 +1,11 @@
 # -*- mode: python; coding: utf-8 -*-
 #
 
-import types
-import simplejson
+try:
+    import simplejson
+except ImportError:
+    from django.utils import simplejson
+
 
 class TolerantJSONEncoder(simplejson.JSONEncoder):
     def default(self, o):

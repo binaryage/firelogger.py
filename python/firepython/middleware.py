@@ -48,6 +48,13 @@ class FirePythonBase(object):
         return data.splitlines()
 
     def _flush_records(self, add_header):
+        """
+        Flush collected logs into response.
+
+        Argument ``add_header`` should be a function receiving two arguments:
+        ``name`` and ``value`` of header.
+        """
+
         records = handler.get_records()
         handler.clear_records()
         logs = []
