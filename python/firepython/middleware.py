@@ -37,7 +37,7 @@ class FirePythonBase(object):
         check = self.FIREPYTHON_UA.search(user_agent)
         if not check:
             return False
-        version = group.check('ver')
+        version = check.group('ver')
         if firepython.__version__ != version:
             logging.debug('FireBug part of FirePython is version %s, but Python part is %s', version, __version__)
         return True
