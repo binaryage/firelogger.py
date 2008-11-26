@@ -5,13 +5,17 @@
 
 import sys
 import types
-import simplejson
 import logging
 import base64
 import time
 import traceback
 import re
 import threading
+
+try:
+    import simplejson
+except ImportError:
+    from django.utils import simplejson
 
 try:
     from hashlib import md5
