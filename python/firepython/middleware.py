@@ -11,6 +11,11 @@ try:
 except ImportError:
     from md5 import md5
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 import firepython
 from firepython.handlers import ThreadBufferedHandler
 from firepython.utils import json_encode
@@ -147,10 +152,12 @@ class FirePythonWSGI(FirePythonBase):
     def __call__(self, environ, start_response):
         # collect headers
         resp_info = []
+        sio = StringIO()
         def faked_start_response(status, headers, exc_info=None):
             resp_info.append(status)
             resp_info.append(headers)
             resp_info.append(exc_info)
+            return sio.write
 
         # run app
         try:
@@ -170,5 +177,8 @@ class FirePythonWSGI(FirePythonBase):
             self._flush_records(add_header)
 
         # start responding
-        start_response(*resp_info)
+        write = start_response(*resp_info)
+        if sio.tell(): # position is not 0
+            sio.seek(0)
+            write(sio.read())
         return output
