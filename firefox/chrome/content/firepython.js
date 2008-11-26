@@ -7,6 +7,7 @@ FBL.ns(function() {
 
         const nsIPrefBranch = Ci.nsIPrefBranch;
         const nsIPrefBranch2 = Ci.nsIPrefBranch2;
+        const nsIWindowMediator = Ci.nsIWindowMediator;
 
         const firepythonPrefService = Cc["@mozilla.org/preferences-service;1"];
         const observerService = CCSV("@mozilla.org/observer-service;1", "nsIObserverService");
@@ -458,7 +459,8 @@ FBL.ns(function() {
             },
             /////////////////////////////////////////////////////////////////////////////////////////
             onOptionsShowing: function(popup) {
-                Firebug.ActivableModule.onOptionsShowing.apply(this, arguments);
+                if (Firebug.ActivableModule.onOptionsShowing) // FB1.4 doesn't have this?
+                    Firebug.ActivableModule.onOptionsShowing.apply(this, arguments);
                 for (var child = popup.firstChild; child; child = child.nextSibling) {
                     if (child.localName == "menuitem") {
                         var option = child.getAttribute("option");
@@ -504,6 +506,27 @@ FBL.ns(function() {
                 dbg(">>>FirePython.onClear");
                 if (!this.currentPanel) return;
                 this.currentPanel.clear();
+            },
+            /////////////////////////////////////////////////////////////////////////////////////////
+            getMostRecentWindow: function(aType) {
+                var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(nsIWindowMediator);
+                return wm.getMostRecentWindow(aType);
+            },
+            /////////////////////////////////////////////////////////////////////////////////////////
+            onPreferences: function() {
+                dbg(">>>FirePython.onPreferences");
+                var features = "chrome,titlebar,toolbar,centerscreen,dialog=no";
+                var url = "chrome://firepython/content/preferences.xul";
+
+                var args = {
+                    FBL: FBL
+                };
+                var win = this.getMostRecentWindow("FirePython:Preferences");
+                if (win) {
+                    win.focus();
+                } else {
+                    openWindow(null, url, features, args);
+                }
             },
             /////////////////////////////////////////////////////////////////////////////////////////
             openPermissions: function(event, context) {

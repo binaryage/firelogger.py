@@ -3,6 +3,10 @@ pref("extensions.firepython.enableSystemPages", "");
 pref("extensions.firepython.enableSites", false);
 
 pref("extensions.firepython.preferredEditor", "");
+pref("extensions.firepython.rewrites", "");
+
+pref("extensions.firepython.password", "");
+pref("extensions.firepython.richFormatting", true);
 
 pref("extensions.firepython.filterDebugLogs", false);
 pref("extensions.firepython.filterInfoLogs", false);

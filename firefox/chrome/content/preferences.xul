@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/global.css"?>
+<?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
+<?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
+<?xml-stylesheet href="chrome://browser/content/preferences/handlers.css"?>
+<?xml-stylesheet href="chrome://browser/skin/preferences/applications.css"?>
+<prefwindow xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
+  id="firepython-preferences" title="FirePython Preferences" type="prefwindow"
+  onload="sizeToContent()" windowtype="FirePython:Preferences" ondialoghelp="openPrefsHelp()">
+  <script type="application/x-javascript" src="chrome://firepython/content/preferences.js"/>
+  <prefpane id="firepython-preferences-main" label="Main" 
+    onpaneload="mainPane.init()" 
+    image="chrome://firepython/skin/preferences-main.png"
+    helpTopic="preferences#main">
+    <preferences>
+      <preference id="preference-password" name="extensions.firepython.password" type="string"/>
+      <preference id="preference-formatting" name="extensions.firepython.richFormatting" type="bool"/>
+    </preferences>
+    <groupbox id="firepython-preferences-main-password-group">
+      <caption label="Password Protection"/>
+      <hbox align="center">
+        <label value="Password" control="firepython-preferences-main-password"/>
+        <textbox id="firepython-preferences-main-password" class="padded" flex="1" type="password" preference="preference-password" oninput="mainPane.update()"/>
+        <button id="firepython-preferences-main-disable-password-protection" label="Disable Password Protection" oncommand="mainPane.disablePasswordProtection()"/>
+      </hbox>
+    </groupbox>
+    <groupbox id="firepython-preferences-main-settings-group">
+      <caption label="Console Settings"/>
+      <hbox align="center">
+        <checkbox flex="1" preference="preference-formatting" label="Rich Formatting (like in Firebug's Console Panel)"/>
+      </hbox>
+    </groupbox>
+  </prefpane>
+  <prefpane id="firepython-preferences-rewrites" label="Rewrites" 
+    onpaneload="rewritesPane.init()" 
+    onselect="rewritesPane.onSelectionChanged()"
+    ondblclick="rewritesPane.changeRewriteRule()"
+    image="chrome://firepython/skin/preferences-rewrites.png"
+    helpTopic="preferences#rewrites">
+    <preferences>
+    </preferences>
+    <vbox flex="1">
+      <label id="firepython-preferences-rewrites-label" control="firepython-preferences-rewrites-list">
+          Path Rewrite Rules
+        </label>
+      <separator class="thin"/>
+      <tree id="firepython-preferences-rewrites-list" flex="1" rows="8" seltype="single" lastSelected="0" 
+        persist="lastSelected">
+        <treecols>
+          <treecol id="firepython-preferences-rewrites-list-original" flex="1" persist="width" label="Original Path"/>
+          <splitter class="tree-splitter"/>
+          <treecol id="firepython-preferences-rewrites-list-rewrited" flex="1" persist="width" label="Rewrited Path"/>
+        </treecols>
+        <treechildren/>
+      </tree>
+    </vbox>
+    <separator class="thin"/>
+    <hbox>
+      <hbox flex="1" class="firepython-preferences-rewrites-buttons">
+        <button id="firepython-preferences-rewrites-add-rule" label="Add" oncommand="rewritesPane.addRewriteRule()"/>
+        <button id="firepython-preferences-rewrites-remove-rule" label="Remove" oncommand="rewritesPane.removeRewriteRule()"/>
+        <button id="firepython-preferences-rewrites-change-rule" label="Change" oncommand="rewritesPane.changeRewriteRule()"/>
+      </hbox>
+    </hbox>
+  </prefpane>
+</prefwindow>

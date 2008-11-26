@@ -9,6 +9,7 @@
   <script type="application/x-javascript" src="chrome://firepython/content/lib/base64.js"/>
   <script type="application/x-javascript" src="chrome://firepython/content/firepython.js"/>
   <commandset id="mainCommandSet">
+    <command id="cmd_FirePythonPreferences" oncommand="Firebug.FirePython.onPreferences()"/>
     <command id="cmd_FirePythonSite" oncommand="Firebug.FirePython.onVisitWebsite('main')"/>
     <command id="cmd_FirePythonClear" oncommand="Firebug.FirePython.onClear()"/>
     <command id="cmd_FirePythonFilterDebug" oncommand="Firebug.FirePython.onFilterLogs('debug')"/>
@@ -29,7 +30,7 @@
       <hbox id="fbFirePythonButtons" insertafter="fbNetButtons" collapsed="true">
         <toolbarbutton id="fbFirePythonMenu" type="menu" tooltiptext="FirePython menu">
           <menupopup onpopupshowing="return Firebug.FirePython.onOptionsShowing(this);">
-            <menuitem label="Settings..." disabled="true" command="cmd_FirePythonSettings"/>
+            <menuitem label="Preferences..." disabled="true" command="cmd_FirePythonPreferences"/>
             <menuseparator/>
             <menuitem label="FirePython Website..." command="cmd_FirePythonSite"/>
           </menupopup>
