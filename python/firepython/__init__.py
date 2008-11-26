@@ -107,14 +107,14 @@ class FirePythonLogHandler(logging.Handler):
         data = base64.encodestring(data)
         return data.splitlines()
 
-    def flush(self, add_header):
+    def flush(self, add_header=None):
         """
         Flush collected logs in response.
 
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
         """
-        if getattr(self.local, 'queue', None) is None:
+        if not getattr(self.local, 'queue', None): # can be []
             return
         chunks = self._encode({"logs": self.local.queue})
         for i, chunk in enumerate(chunks):
