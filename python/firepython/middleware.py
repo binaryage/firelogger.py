@@ -60,7 +60,7 @@ class FirePythonBase(object):
         logs = []
         for record in records:
             logs.append(self._prepare_log_record(record))
-            
+
         chunks = self._encode({"logs": logs})
         for i, chunk in enumerate(chunks):
             add_header('FirePython-%d' % i, chunk)
@@ -107,25 +107,23 @@ class FirePythonDjango(FirePythonBase):
 
     def __init__(self):
         from django.conf import settings
-
-        self._enable = getattr(settings, 'FIREPYTHON_ENABLE', False)
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
 
     def process_request(self, request):
-        if not self._enable or not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
+        if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
             return
 
-        if self._password is not None and \
-               not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', '')):
+        if (self._password and
+            not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
             return
 
         handler.clear_records()
 
     def process_response(self, request, response):
-        if not self._enable or not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
+        if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
             return response
-        if self._password is not None and \
-               not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', '')):
+        if (self._password and
+            not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
             return response
 
         self._flush_records(response.__setitem__)
@@ -158,9 +156,9 @@ class FirePythonWSGI(FirePythonBase):
         def add_header(name, value):
             resp_info[1].append((name, value))
 
-        if self._ua_check(environ.get('HTTP_USER_AGENT', '')) and \
-               not (self._password is not None and \
-                    not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', ''))):
+        if (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
+            not (self._password and
+                 not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', '')))):
             self._flush_records(add_header)
 
         # start responding
