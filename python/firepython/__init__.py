@@ -114,6 +114,8 @@ class FirePythonLogHandler(logging.Handler):
         Argument ``add_header`` should be a function receiving two arguments:
         ``name`` and ``value`` of header.
         """
+        if add_header is None: # flush() is called at program end
+            return
         if not getattr(self.local, 'queue', None): # can be []
             return
         chunks = self._encode({"logs": self.local.queue})
