@@ -11,6 +11,11 @@ try:
 except ImportError:
     from md5 import md5
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 import firepython
 from firepython.handlers import ThreadBufferedHandler
 from firepython.utils import json_encode
@@ -32,7 +37,8 @@ class FirePythonBase(object):
         check = self.FIREPYTHON_UA.search(user_agent)
         if not check:
             return False
-        if firepython.__version__ != check.group('ver'):
+        version = group.check('ver')
+        if firepython.__version__ != version:
             logging.debug('FireBug part of FirePython is version %s, but Python part is %s', version, __version__)
         return True
 
@@ -129,6 +135,10 @@ class FirePythonDjango(FirePythonBase):
         self._flush_records(response.__setitem__)
         return response
 
+    def process_exception(self, request, exception):
+        logging.exception(exception)
+
+
 class FirePythonWSGI(FirePythonBase):
     """
     WSGI middleware to enable FirePython logging.
@@ -143,14 +153,20 @@ class FirePythonWSGI(FirePythonBase):
     def __call__(self, environ, start_response):
         # collect headers
         resp_info = []
+        sio = StringIO()
         def faked_start_response(status, headers, exc_info=None):
             resp_info.append(status)
             resp_info.append(headers)
             resp_info.append(exc_info)
+            return sio.write
 
         # run app
-        app_iter = self._app(environ, faked_start_response)
-        output = list(app_iter)
+        try:
+            app_iter = self._app(environ, faked_start_response)
+            output = list(app_iter)
+        except Exception, e:
+            logging.exception(e)
+            raise
 
         # collect logs
         def add_header(name, value):
@@ -162,5 +178,8 @@ class FirePythonWSGI(FirePythonBase):
             self._flush_records(add_header)
 
         # start responding
-        start_response(*resp_info)
+        write = start_response(*resp_info)
+        if sio.tell(): # position is not 0
+            sio.seek(0)
+            write(sio.read())
         return output
