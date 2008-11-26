@@ -162,8 +162,13 @@ FBL.ns(function() {
                 }
             },
             /////////////////////////////////////////////////////////////////////////////////////////
+            cachePrefs: function() {
+                this._password = this.getPref('password');
+            },
+            /////////////////////////////////////////////////////////////////////////////////////////
             start: function() {
                 dbg(">>>FirePython.start");
+                this.cachePrefs();
                 observerService.addObserver(this, "http-on-modify-request", false);
                 Firebug.NetMonitor.addListener(this);
             },
@@ -181,19 +186,28 @@ FBL.ns(function() {
                 context.queueFile(file);
             },
             /////////////////////////////////////////////////////////////////////////////////////////
+            prepareAuth: function(password) {
+                // this must match with python library code
+                var auth = "#FirePythonPassword#"+password+"#";
+                return hex_md5(auth);
+            },
+            /////////////////////////////////////////////////////////////////////////////////////////
             observe: function(subject, topic, data) {
                 dbg(">>>FirePython.observe: "+topic);
                 Firebug.ActivableModule.observe.apply(this, [subject, topic, data]);
                 if (topic == "http-on-modify-request") {
                     var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
-                    // add FirePython/X.X.X to User-Agent header if not already there and firepython is enabled
-                    // if firepython is not enabled remove header from request if it exists
-                    // why X-FirePython? don't know, see https://developer.mozilla.org/En/Setting_HTTP_request_headers
+                    // add FirePython/X.X.X to User-Agent header if not already there
+                    // see https://developer.mozilla.org/En/Setting_HTTP_request_headers
                     if (httpChannel.getRequestHeader("User-Agent").match(/\sX-FirePython\/([\.|\d]*)\s?/) == null) {
                         httpChannel.setRequestHeader("User-Agent", httpChannel.getRequestHeader("User-Agent") + ' ' + "X-FirePython/" + this.version, false);
                     }
+                    if (this._password) {
+                        httpChannel.setRequestHeader("X-FirePythonAuth", this.prepareAuth(this._password), false);
+                    }
                 }
                 if (topic == "nsPref:changed") {
+                    this.cachePrefs();
                     var parts = data.split(".");
                     var name = parts[parts.length-1];
                     var value = this.getPref(name);
