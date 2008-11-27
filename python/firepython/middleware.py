@@ -39,7 +39,7 @@ class FirePythonBase(object):
             return False
         version = check.group('ver')
         if firepython.__version__ != version:
-            logging.debug('FireBug part of FirePython is version %s, but Python part is %s', version, __version__)
+            logging.warning('FireBug part of FirePython is version %s, but Python part is %s', version, __version__)
         return True
 
     def _password_check(self, password):
