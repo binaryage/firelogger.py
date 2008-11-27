@@ -20,18 +20,24 @@ import firepython
 from firepython.handlers import ThreadBufferedHandler
 from firepython.utils import json_encode
 
-
-rootLogger = logging.getLogger()
-rootLogger.setLevel(logging.NOTSET)
-handler = ThreadBufferedHandler()
-rootLogger.addHandler(handler)
-
-
 class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
+    
+    def install_handler(self, level=logging.DEBUG, logger_name=None):
+        self.logger = logging.getLogger(logger_name)
+        self.logger.setLevel(level)
+        self.handler = ThreadBufferedHandler()
+        self.logger.addHandler(self.handler)
+
+    def uninstall_handler(self):
+        if getattr(self, 'logger', None) is None:
+            return
+        self.logger.removeHandler(self.handler)
+        self.logger = None
+        self.handler = None
 
     def _ua_check(self, user_agent):
         check = self.FIREPYTHON_UA.search(user_agent)
@@ -61,8 +67,8 @@ class FirePythonBase(object):
         ``name`` and ``value`` of header.
         """
 
-        records = handler.get_records()
-        handler.clear_records()
+        records = self.handler.get_records()
+        self.handler.clear_records()
         logs = []
         for record in records:
             logs.append(self._prepare_log_record(record))
@@ -74,7 +80,7 @@ class FirePythonBase(object):
     def _prepare_log_record(self, record):
         data = {
             "level": self._log_level(record.levelno),
-            "message": handler.format(record),
+            "message": self.handler.format(record),
             "timestamp": long(record.created * 1000 * 1000),
             "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
                      (".%03d" % ((record.created - long(record.created)) * 1000)))
@@ -107,13 +113,17 @@ class FirePythonDjango(FirePythonBase):
     To use add 'firepython.django.FirePythonDjango' to your MIDDLEWARE_CLASSES
     setting.
 
-    Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs
-    with password.
+    Optional settings:
+    Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs with password.
+    Set ``FIREPYTHON_LEVEL`` to logging level you want to send over the wire.
+    Set ``FIREPYTHON_LOGGER_NAME`` to specific logger name you want to monitor.
     """
 
     def __init__(self):
         from django.conf import settings
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
+        self._level = getattr(settings, 'FIREPYTHON_LEVEL', logging.DEBUG)
+        self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
 
     def process_request(self, request):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
@@ -123,7 +133,7 @@ class FirePythonDjango(FirePythonBase):
             not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
             return
 
-        handler.clear_records()
+        self.install_handler(self._level, self._logger_name)
 
     def process_response(self, request, response):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
@@ -133,6 +143,7 @@ class FirePythonDjango(FirePythonBase):
             return response
 
         self._flush_records(response.__setitem__)
+        self.uninstall_handler()
         return response
 
     def process_exception(self, request, exception):
@@ -144,13 +155,17 @@ class FirePythonWSGI(FirePythonBase):
     WSGI middleware to enable FirePython logging.
 
     Supply an application object and an optional password to enable password
-    protection.
+    protection. Also logging level nad logger name may be specified.
     """
-    def __init__(self, app, password=None):
+    def __init__(self, app, password=None, level=logging.DEBUG, logger_name=None):
         self._app = app
         self._password = password
+        self._level = level
+        self._logger_name = logger_name
 
     def __call__(self, environ, start_response):
+        self.install_handler(self._level, self._logger_name)
+        
         # collect headers
         resp_info = []
         sio = StringIO()
@@ -182,4 +197,6 @@ class FirePythonWSGI(FirePythonBase):
         if sio.tell(): # position is not 0
             sio.seek(0)
             write(sio.read())
+        
+        self.uninstall_handler()
         return output
