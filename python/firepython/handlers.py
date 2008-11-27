@@ -18,11 +18,28 @@ class ThreadBufferedHandler(Handler):
             raise NotImplementedError("ThreadBufferedHandler cannot be used "
                                       "if threading is not supported.")
         Handler.__init__(self)
-        self.records = {} # Dictionary (Thread -> list of records)
+        self.records = {} # dictionary (Thread -> list of records)
+        self._enabled = {} # dictionary (Thread -> enabled/disabled)
+
+    def start(self, thread=None):
+        if not thread:
+            thread = threading.currentThread()
+        self._enabled[thread] = True
+
+    def finish(self, thread=None):
+        if not thread:
+            thread = threading.currentThread()
+        self._enabled.pop(thread, None)
+
+    def is_enabled(self, thread=None):
+        if not thread:
+            thread = threading.currentThread()
+        return self._enabled.get(thread, False)
 
     def emit(self, record):
         """ Append the record to the buffer for the current thread. """
-        self.get_records().append(record)
+        if self.is_enabled():
+            self.get_records().append(record)
 
     def get_records(self, thread=None):
         """

@@ -100,6 +100,12 @@ class FirePythonBase(object):
         else:
             return "debug"
 
+    def _start(self):
+        handler.start()
+
+    def _finish(self):
+        handler.finish()
+
 
 class FirePythonDjango(FirePythonBase):
     """
@@ -128,7 +134,7 @@ class FirePythonDjango(FirePythonBase):
             not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
             return
 
-        handler.clear_records()
+        self._start()
 
     def process_response(self, request, response):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
@@ -137,10 +143,17 @@ class FirePythonDjango(FirePythonBase):
             not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
             return response
 
+        self._finish()
         self._flush_records(response.__setitem__)
         return response
 
     def process_exception(self, request, exception):
+        if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
+            return response
+        if (self._password and
+            not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
+            return response
+
         logging.exception(exception)
 
 
@@ -159,7 +172,7 @@ class FirePythonWSGI(FirePythonBase):
 
     def __call__(self, environ, start_response):
         self.install_handler(self._level, self._logger_name)
-        
+
         # collect headers
         resp_info = []
         sio = StringIO()
@@ -169,6 +182,7 @@ class FirePythonWSGI(FirePythonBase):
             resp_info.append(exc_info)
             return sio.write
 
+        self._start()
         # run app
         try:
             app_iter = self._app(environ, faked_start_response)
@@ -180,6 +194,7 @@ class FirePythonWSGI(FirePythonBase):
             logging.warning("DeprecationWarning: raising a string exception is deprecated")
             logging.exception(sys.exc_info()[0])
             raise
+        self._finish()
 
         # collect logs
         def add_header(name, value):
