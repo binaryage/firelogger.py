@@ -132,14 +132,16 @@ task :default do
   dep(File.join(FIREFOX, 'install.rdf'))
   dep(File.join(FIREFOX, 'license.txt'))
   my_mkdir(DST) unless File.exist?(DST)
+  
+  firepython_js_path = File.join(TMP, "chrome", "content", "firepython.js")
+  patch(firepython_js_path, /(dbg\(.*\);)/, "/*\\1*/")
 
   res = "#{DST}/firepython-#{version}.xpi"
   File.unlink(res) if File.exists?(res)
   puts "#{cmd_color('zipping')} #{file_color(res)}"
-  owd = Dir.getwd()
-  Dir.chdir(TMP)
-  puts red('need zip on command line (download http://www.info-zip.org/Zip.html)') unless system("zip -r \"#{res}\" *");
-  Dir.chdir(owd)
+  Dir.chdir(TMP) do
+    puts red('need zip on command line (download http://www.info-zip.org/Zip.html)') unless system("zip -r \"#{res}\" *");
+  end
   remove_dir(TMP) if File.exist?(TMP) # recursive!
 end
 
