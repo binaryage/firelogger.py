@@ -108,13 +108,17 @@ class FirePythonDjango(FirePythonBase):
     To use add 'firepython.django.FirePythonDjango' to your MIDDLEWARE_CLASSES
     setting.
 
-    Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs
-    with password.
+    Optional settings:
+    Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs with password.
+    Set ``FIREPYTHON_LEVEL`` to logging level you want to send over the wire.
+    Set ``FIREPYTHON_LOGGER_NAME`` to specific logger name you want to monitor.
     """
 
     def __init__(self):
         from django.conf import settings
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
+        self._level = getattr(settings, 'FIREPYTHON_LEVEL', logging.DEBUG)
+        self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
 
     def process_request(self, request):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
@@ -145,13 +149,17 @@ class FirePythonWSGI(FirePythonBase):
     WSGI middleware to enable FirePython logging.
 
     Supply an application object and an optional password to enable password
-    protection.
+    protection. Also logging level nad logger name may be specified.
     """
-    def __init__(self, app, password=None):
+    def __init__(self, app, password=None, level=logging.DEBUG, logger_name=None):
         self._app = app
         self._password = password
+        self._level = level
+        self._logger_name = logger_name
 
     def __call__(self, environ, start_response):
+        self.install_handler(self._level, self._logger_name)
+        
         # collect headers
         resp_info = []
         sio = StringIO()
