@@ -4,6 +4,7 @@
 import base64
 import logging
 import re
+import sys
 import time
 
 try:
@@ -179,8 +180,12 @@ class FirePythonWSGI(FirePythonBase):
         try:
             app_iter = self._app(environ, faked_start_response)
             output = list(app_iter)
-        except Exception, e:
-            logging.exception(e)
+        except Exception:
+            logging.exception(sys.exc_info()[1])
+            raise
+        except:
+            logging.warning("DeprecationWarning: raising a string exception is deprecated")
+            logging.exception(sys.exc_info()[0])
             raise
 
         # collect logs
