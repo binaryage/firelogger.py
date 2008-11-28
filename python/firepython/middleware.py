@@ -34,19 +34,6 @@ class FirePythonBase(object):
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
 
-    def install_handler(self, level=logging.DEBUG, logger_name=None):
-        self.logger = logging.getLogger(logger_name)
-        self.logger.setLevel(level)
-        self.handler = ThreadBufferedHandler()
-        self.logger.addHandler(self.handler)
-
-    def uninstall_handler(self):
-        if getattr(self, 'logger', None) is None:
-            return
-        self.logger.removeHandler(self.handler)
-        self.logger = None
-        self.handler = None
-
     def _ua_check(self, user_agent):
         check = self.FIREPYTHON_UA.search(user_agent)
         if not check:
@@ -184,7 +171,6 @@ class FirePythonWSGI(FirePythonBase):
         self._logger_name = logger_name
 
     def __call__(self, environ, start_response):
-        self.install_handler(self._level, self._logger_name)
 
         # collect headers
         resp_info = []
