@@ -3,36 +3,35 @@
 from logging import Handler
 
 
+threading_supported = False
 try:
     import threading
-    threading_supported = True
+    if threading:
+        threading_supported = True
 except ImportError:
-    threading_supported = False
+    pass
 
 
 class ThreadBufferedHandler(Handler):
     """ A logging handler that buffers records by thread. """
 
     def __init__(self):
-        if not threading_supported:
-            raise NotImplementedError("ThreadBufferedHandler cannot be used "
-                                      "if threading is not supported.")
         Handler.__init__(self)
         self.records = {} # dictionary (Thread -> list of records)
         self._enabled = {} # dictionary (Thread -> enabled/disabled)
 
     def start(self, thread=None):
-        if not thread:
+        if not thread and threading_supported:
             thread = threading.currentThread()
         self._enabled[thread] = True
 
     def finish(self, thread=None):
-        if not thread:
+        if not thread and threading_supported:
             thread = threading.currentThread()
         self._enabled.pop(thread, None)
 
     def is_enabled(self, thread=None):
-        if not thread:
+        if not thread and threading_supported:
             thread = threading.currentThread()
         return self._enabled.get(thread, False)
 
@@ -46,7 +45,7 @@ class ThreadBufferedHandler(Handler):
         Gets the log messages of the specified thread, or the current thread if
         no thread is specified.
         """
-        if not thread:
+        if not thread and threading_supported:
             thread = threading.currentThread()
         if thread not in self.records:
             self.records[thread] = []
@@ -57,7 +56,7 @@ class ThreadBufferedHandler(Handler):
         Clears the log messages of the specified thread, or the current thread
         if no thread is specified.
         """
-        if not thread:
+        if not thread and threading_supported:
             thread = threading.currentThread()
         if thread in self.records:
             del self.records[thread]

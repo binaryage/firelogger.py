@@ -34,13 +34,26 @@ class FirePythonBase(object):
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
 
+    def install_handler(self, level=logging.DEBUG, logger_name=None):
+        self.logger = logging.getLogger(logger_name)
+        self.logger.setLevel(level)
+        self.handler = ThreadBufferedHandler()
+        self.logger.addHandler(self.handler)
+
+    def uninstall_handler(self):
+        if getattr(self, 'logger', None) is None:
+            return
+        self.logger.removeHandler(self.handler)
+        self.logger = None
+        self.handler = None
+
     def _ua_check(self, user_agent):
         check = self.FIREPYTHON_UA.search(user_agent)
         if not check:
             return False
         version = check.group('ver')
         if firepython.__version__ != version:
-            logging.warning('FireBug part of FirePython is version %s, but Python part is %s', version, __version__)
+            logging.warning('FireBug part of FirePython is version %s, but Python part is %s', version, firepython.__version__)
         return True
 
     def _password_check(self, password):
