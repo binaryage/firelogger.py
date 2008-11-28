@@ -171,6 +171,12 @@ class FirePythonWSGI(FirePythonBase):
         self._logger_name = logger_name
 
     def __call__(self, environ, start_response):
+        process = (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
+                   not (self._password and
+                        not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', ''))))
+
+        if not process:
+            return self._app(environ, start_response)
 
         # collect headers
         resp_info = []
@@ -180,6 +186,9 @@ class FirePythonWSGI(FirePythonBase):
             resp_info.append(headers)
             resp_info.append(exc_info)
             return sio.write
+
+        def add_header(name, value):
+            resp_info[1].append((name, value))
 
         self._start()
         # run app
@@ -193,15 +202,8 @@ class FirePythonWSGI(FirePythonBase):
             logging.warning("DeprecationWarning: raising a string exception is deprecated")
             logging.exception(sys.exc_info()[0])
             raise
-        self._finish()
-
-        # collect logs
-        def add_header(name, value):
-            resp_info[1].append((name, value))
-
-        if (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
-            not (self._password and
-                 not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', '')))):
+        finally:
+            self._finish()
             self._flush_records(add_header)
 
         # start responding
