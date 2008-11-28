@@ -17,10 +17,11 @@
 #10. >rake
 
 ROOT = File.expand_path('.')
-FIREFOX = File.join(ROOT, 'firefox')
+ADDON = File.expand_path(File.join(ROOT, '..', 'firepython-addon')) # firepython-addon is expected to be at same directory level as firepython project
+FIREFOX = File.join(ADDON, 'firefox')
 DST = File.join(ROOT, 'build')
 TMP = File.join(ROOT, 'tmp')
-PYTHON = File.join(ROOT, 'python')
+PYTHON = ROOT
 
 # http://kpumuk.info/ruby-on-rails/colorizing-console-ruby-script-output/
 begin
@@ -118,10 +119,15 @@ def patch(filepath, matcher, replacer)
   applied
 end
 
+def check_if_addon_exists()
+  die("firepython-addon not found!\n  expected to be in #{ADDON}") unless File.exists?(ADDON)
+end
+
 ################################################################################
 
 desc "Prepare XPI"
 task :default do
+  check_if_addon_exists()
   version = parse_version()
 
   remove_dir(TMP) if File.exists?(TMP) # recursive!
@@ -155,6 +161,7 @@ end
 
 desc "Resets version in all relevant sources"
 task :version do
+  check_if_addon_exists()
   version = ARGV[1] or die("Please specify a version as first parameter")
   firepython_js_path = File.join(FIREFOX, 'chrome', 'content', 'firepython.js')
   if not patch(firepython_js_path, /version: '([0-9\.])+'/, "version: '#{version}'")

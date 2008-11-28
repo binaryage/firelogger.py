@@ -19,6 +19,8 @@ The latest version is [available here][firepython].
 Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
 In this case you may [try workaround][workaround].
 
+Here is [source repository for firefox addon][addon-homepage].
+
 ### Python Library
 
 #### The easy way:
@@ -110,7 +112,7 @@ IRC channel [#firepython][irc] at freenode
   * log record searching
   * opening files in TextMate (click to timestamp field)
 
-[screenshot]: http://github.com/woid/firepython/tree/master/support/screenshot.png?raw=true "FirePython in action"
+[screenshot]: http://github.com/woid/firepython-addon/tree/master/support/screenshot.png?raw=true "FirePython in action"
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
 [firepython]: https://addons.mozilla.org/en-US/firefox/addon/9602
@@ -126,3 +128,4 @@ IRC channel [#firepython][irc] at freenode
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
 [irc]:irc://irc.freenode.net/#firepython
+[addon-homepage]: http://github.com/woid/firepython-addon
