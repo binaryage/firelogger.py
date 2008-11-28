@@ -79,7 +79,11 @@ Version 0.2 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
 
 # Support
 
-The support [forum is here][support].
+### Bugs / Feature requests
+[The support forum is here][support].
+
+### IRC
+IRC channel [#firepython][irc] at freenode
 
 # Articles
 
@@ -121,3 +125,4 @@ The support [forum is here][support].
 [ivan]:http://github.com/oxyum
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
+[irc]:irc://irc.freenode.net/#firepython
