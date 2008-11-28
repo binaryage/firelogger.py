@@ -83,6 +83,15 @@ def dep(src)
   cp(s, d, {:verbose => false})
 end
 
+def dep2(src, add='')
+  s = File.expand_path src
+  rs = s[ROOT.size..-1]
+  d = File.join(TMP, add, rs)
+  puts "#{cmd_color('copying')} #{file_color(s)}"
+  puts "     -> #{file_color(d)}"
+  cp(s, d, {:verbose => false})
+end
+
 def my_mkdir(dir)
   puts "#{cmd_color('creating directory')} #{dir_color(dir)}"
   mkdir(dir, {:verbose => false})
@@ -153,10 +162,27 @@ end
 
 desc "Update PyPI index and upload library sources"
 task :pypi do
-  Dir.chdir(PYTHON) do
+  remove_dir(TMP) if File.exists?(TMP) # recursive!
+  mkdir(TMP, {:verbose => false})
+
+  dep2(File.join(ROOT, 'README.markdown'))
+  dep2(File.join(ROOT, 'license.txt'))
+  dep2(File.join(ROOT, 'setup.py'))
+
+  firepython_dir = File.join(TMP, 'firepython')
+  my_mkdir(firepython_dir) unless File.exist?(firepython_dir)
+  dep2(File.join(ROOT, '__init__.py'), 'firepython')
+  dep2(File.join(ROOT, 'gaesupport.py'), 'firepython')
+  dep2(File.join(ROOT, 'middleware.py'), 'firepython')
+  dep2(File.join(ROOT, 'utils.py'), 'firepython')
+  dep2(File.join(ROOT, 'handlers.py'), 'firepython')
+  
+  Dir.chdir(TMP) do
     system("python setup.py register") or die("register failed")
     system("python setup.py sdist upload") or die("upload failed")
   end 
+
+  remove_dir(TMP) if File.exist?(TMP) # recursive!
 end
 
 desc "Resets version in all relevant sources"
