@@ -21,18 +21,24 @@ import firepython
 from firepython.handlers import ThreadBufferedHandler
 from firepython.utils import json_encode
 
-
-rootLogger = logging.getLogger()
-rootLogger.setLevel(logging.NOTSET)
-handler = ThreadBufferedHandler()
-rootLogger.addHandler(handler)
-
-
 class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
+    
+    def install_handler(self):
+        logger = logging.getLogger(self._logger_name)
+        logger.setLevel(self._level)
+        self._handler = ThreadBufferedHandler()
+        logger.addHandler(self._handler)
+    
+    def uninstall_handler(self):
+        if self._handler is None: 
+            return
+        logger = logging.getLogger(self._logger_name)
+        logger.removeHandler(self._handler)
+        self._handler = None
 
     def _ua_check(self, user_agent):
         check = self.FIREPYTHON_UA.search(user_agent)
@@ -62,8 +68,9 @@ class FirePythonBase(object):
         ``name`` and ``value`` of header.
         """
 
-        records = handler.get_records()
-        handler.clear_records()
+        records = self._handler.get_records()
+        logging.debug('sending %d' % len(records))
+        self._handler.clear_records()
         logs = []
         for record in records:
             logs.append(self._prepare_log_record(record))
@@ -75,7 +82,7 @@ class FirePythonBase(object):
     def _prepare_log_record(self, record):
         data = {
             "level": self._log_level(record.levelno),
-            "message": handler.format(record),
+            "message": self._handler.format(record),
             "timestamp": long(record.created * 1000 * 1000),
             "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
                      (".%03d" % ((record.created - long(record.created)) * 1000)))
@@ -101,10 +108,10 @@ class FirePythonBase(object):
             return "debug"
 
     def _start(self):
-        handler.start()
+        self._handler.start()
 
     def _finish(self):
-        handler.finish()
+        self._handler.finish()
 
 
 class FirePythonDjango(FirePythonBase):
@@ -125,6 +132,7 @@ class FirePythonDjango(FirePythonBase):
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
         self._level = getattr(settings, 'FIREPYTHON_LEVEL', logging.DEBUG)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
+        self.install_handler()
 
     def process_request(self, request):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
@@ -169,6 +177,7 @@ class FirePythonWSGI(FirePythonBase):
         self._password = password
         self._level = level
         self._logger_name = logger_name
+        self.install_handler()
 
     def __call__(self, environ, start_response):
         process = (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
