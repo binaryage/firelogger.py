@@ -35,7 +35,7 @@ Clone [project from github][homepage] in your project directory.
 
 Or if your web project uses git for versioning, you may want to be cool and use firepython as a submodule of your git repository.
   
-  >git submodule add git://github.com/woid/firepython.git firepython
+``git submodule add git://github.com/woid/firepython.git firepython``
 
 (you may want to replace last parameter with real path in your repo)
 
@@ -55,22 +55,21 @@ After installation, enable middleware ``firepython.middleware.FirePythonWSGI``.
 
 In all places where you want to capture logging ...
 
-<code>
+<pre>
+import firepython
 
-    import firepython
+# somewhere at the beginning of your response, before any of your loggings take place:
+handler = firepython.FirePythonLogHandler()
+logger = logging.getLogger()
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
-    # somewhere at the beginning of your response, before any of your loggings take place:
-    handler = firepython.FirePythonLogHandler()
-    logger = logging.getLogger()
-    logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
-  
-    # ... your handler code here
+# ... your handler code here
 
-    # right before serving your response back to client:
-    logger.removeHandler(handler)
-    handler.flush(response.add_header)   # this will add headers into response
-</code>
+# right before serving your response back to client:
+logger.removeHandler(handler)
+handler.flush(response.add_header)   # this will add headers into response
+</pre>
 
 # Current State
 
