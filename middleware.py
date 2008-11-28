@@ -133,6 +133,9 @@ class FirePythonDjango(FirePythonBase):
         self._level = getattr(settings, 'FIREPYTHON_LEVEL', logging.DEBUG)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
         self.install_handler()
+        
+    def __del__(self):
+        self.uninstall_handler()
 
     def process_request(self, request):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
@@ -179,6 +182,9 @@ class FirePythonWSGI(FirePythonBase):
         self._logger_name = logger_name
         self.install_handler()
 
+    def __del__(self):
+        self.uninstall_handler()
+        
     def __call__(self, environ, start_response):
         process = (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
                    not (self._password and
