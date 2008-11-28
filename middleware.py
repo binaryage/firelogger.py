@@ -29,7 +29,6 @@ class FirePythonBase(object):
     
     def install_handler(self):
         logger = logging.getLogger(self._logger_name)
-        logger.setLevel(self._level)
         self._handler = ThreadBufferedHandler()
         logger.addHandler(self._handler)
     
@@ -123,14 +122,12 @@ class FirePythonDjango(FirePythonBase):
 
     Optional settings:
     Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs with password.
-    Set ``FIREPYTHON_LEVEL`` to logging level you want to send over the wire.
     Set ``FIREPYTHON_LOGGER_NAME`` to specific logger name you want to monitor.
     """
 
     def __init__(self):
         from django.conf import settings
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
-        self._level = getattr(settings, 'FIREPYTHON_LEVEL', logging.DEBUG)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
         self.install_handler()
         
@@ -175,10 +172,9 @@ class FirePythonWSGI(FirePythonBase):
     Supply an application object and an optional password to enable password
     protection. Also logging level nad logger name may be specified.
     """
-    def __init__(self, app, password=None, level=logging.DEBUG, logger_name=None):
+    def __init__(self, app, password=None, logger_name=None):
         self._app = app
         self._password = password
-        self._level = level
         self._logger_name = logger_name
         self.install_handler()
 
