@@ -29,10 +29,17 @@ Here is [source repository for firefox addon][addon-homepage].
 
 #### The manual way:
 
-Clone [project from github][homepage] and copy folder [python/firepython][firepython-folder] in your project directory.
-Or alternatively you may want to add folder [python][python-folder] into your ``sys.path``.
+Just note, that it depends on simplejson.
 
-It depends on simplejson!
+Clone [project from github][homepage] in your project directory.
+
+Or if your web project uses git for versioning, you may want to be cool and use firepython as a submodule of your git repository.
+  
+  >git submodule add git://github.com/woid/firepython.git firepython
+
+(you may want to replace last parameter with real path in your repo)
+
+If firepython directory is not on your import paths, you need to add ``firepython`` folder into your ``sys.path``.
 
 ## Usage:
 
@@ -121,8 +128,6 @@ IRC channel [#firepython][irc] at freenode
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
 [support]: http://firepython.uservoice.com/
 [firepython-no-prints]:http://blogg.ingspree.net/blog/2008/11/24/firepython-no-prints/
-[python-folder]:http://github.com/woid/firepython/tree/master/python
-[firepython-folder]:http://github.com/woid/firepython/tree/master/python/firepython
 [alexander]:http://github.com/piranha
 [ivan]:http://github.com/oxyum
 [firebug-team]:http://getfirebug.com/workingGroup
