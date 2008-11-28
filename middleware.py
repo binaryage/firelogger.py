@@ -170,7 +170,7 @@ class FirePythonWSGI(FirePythonBase):
     WSGI middleware to enable FirePython logging.
 
     Supply an application object and an optional password to enable password
-    protection. Also logging level nad logger name may be specified.
+    protection. Also logger name may be specified.
     """
     def __init__(self, app, password=None, logger_name=None):
         self._app = app
