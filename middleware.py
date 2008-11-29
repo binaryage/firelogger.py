@@ -68,7 +68,6 @@ class FirePythonBase(object):
         """
 
         records = self._handler.get_records()
-        logging.debug('sending %d' % len(records))
         self._handler.clear_records()
         logs = []
         for record in records:
@@ -191,16 +190,18 @@ class FirePythonWSGI(FirePythonBase):
             return self._app(environ, start_response)
 
         # collect headers
-        resp_info = []
+        status = "200 OK"
+        headers = []
+        exc_info = None
         sio = StringIO()
-        def faked_start_response(status, headers, exc_info=None):
-            resp_info.append(status)
-            resp_info.append(headers)
-            resp_info.append(exc_info)
+        def faked_start_response(_status, _headers, _exc_info=None):
+            status = _status
+            headers = _headers
+            exc_info = _exc_info
             return sio.write
 
         def add_header(name, value):
-            resp_info[1].append((name, value))
+            headers.append((name, value))
 
         self._start()
         # run app
@@ -219,7 +220,7 @@ class FirePythonWSGI(FirePythonBase):
             self._flush_records(add_header)
 
         # start responding
-        write = start_response(*resp_info)
+        write = start_response(status, headers, exc_info)
         if sio.tell(): # position is not 0
             sio.seek(0)
             write(sio.read())
