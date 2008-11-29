@@ -99,17 +99,17 @@ IRC channel [#firepython][irc] at freenode
 
 # History
 
-* 0.3 (to be released)
+* v0.3 (to be released)
   * password protection for production site
   * thread-safety
   * improved API
 
-* 0.2 (24.11.2008)
+* v0.2 (24.11.2008)
   * Django and WSGI middlewares by Alexander Solovyov
   * added as firepython package to PyPI index
   * fixed FirePython panel styles when Firebug window was detached from main window
 
-* 0.1 (15.11.2008) 
+* v0.1 (15.11.2008) 
   * public alpha release
   * initial server-side support for Python and Google App Engine
   * communication via response headers
