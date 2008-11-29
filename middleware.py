@@ -6,6 +6,7 @@ import logging
 import re
 import sys
 import time
+import traceback
 
 try:
     from hashlib import md5
@@ -86,12 +87,24 @@ class FirePythonBase(object):
             "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
                      (".%03d" % ((record.created - long(record.created)) * 1000)))
         }
-        props = ["args", "pathname", "lineno", "exc_info", "exc_text", "name", "process", "thread", "threadName"]
+        props = ["args", "pathname", "lineno", "exc_text", "name", "process", "thread", "threadName"]
         for p in props:
             try:
                 data[p] = getattr(record, p)
             except AttributeError:
                 pass
+           
+        try:
+            exc_info = getattr(record, 'exc_info')
+            if exc_info is not None:
+                exc_type = exc_info[0]
+                exc_value = exc_info[1]
+                exc_traceback = exc_info[2]
+                if exc_traceback is not None:
+                    exc_traceback = traceback.extract_tb(exc_traceback)
+                data['exc_info'] = (exc_type, exc_value, exc_traceback)
+        except AttributeError:
+            pass
         return data
 
     def _log_level(self, level):
