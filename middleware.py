@@ -82,6 +82,7 @@ class FirePythonBase(object):
         data = {
             "level": self._log_level(record.levelno),
             "message": self._handler.format(record),
+            "template": record.msg,
             "timestamp": long(record.created * 1000 * 1000),
             "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
                      (".%03d" % ((record.created - long(record.created)) * 1000)))
