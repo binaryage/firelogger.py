@@ -1,6 +1,6 @@
 # FirePython
 
-FirePython is a sexy Python logger console integrated into [Firebug 1.3][firebug]. 
+FirePython is a sexy Python logger console integrated into [Firebug][firebug]. 
 
 Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].
 
@@ -8,7 +8,7 @@ Originally, I have created it to light up my lonely nights I was spending with [
 
 ## Prerequisites
 
-You definitely need [Firebug 1.3][firebug].
+You definitely need [Firebug 1.2 or higher][firebug].
 
 ## Installation
 
@@ -19,7 +19,7 @@ The latest version is [available here][firepython].
 Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
 In this case you may [try workaround][workaround].
 
-Here is [source repository for firefox addon][addon-homepage].
+Here is [source repository for firefox addon][addon-homepage] with instructions how to install bleeding edge version.
 
 ### Python Library
 
@@ -53,27 +53,13 @@ After installation, enable middleware ``firepython.middleware.FirePythonWSGI``.
 
 ### Custom usage
 
-In all places where you want to capture logging ...
-
-<pre>
-import firepython
-
-# somewhere at the beginning of your response, before any of your loggings take place:
-handler = firepython.FirePythonLogHandler()
-logger = logging.getLogger()
-logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
-
-# ... your handler code here
-
-# right before serving your response back to client:
-logger.removeHandler(handler)
-handler.flush(response.add_header)   # this will add headers into response
-</pre>
+Look for inspiration in [middleware.py][middleware-source]
 
 # Current State
 
 Version 0.2 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
+
+Version 0.3 will also work with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.1 + Firefox 3.0.4.
 
 # Contributors
 
@@ -100,7 +86,10 @@ IRC channel [#firepython][irc] at freenode
 # History
 
 * v0.3 (to be released)
+  * compatibility with Firebug 1.2
   * password protection for production site
+  * path rewrite functionality
+  * console supports rich formatting of python log messages
   * thread-safety
   * improved API
 
@@ -133,3 +122,4 @@ IRC channel [#firepython][irc] at freenode
 [firephp-authors]:http://www.christophdorn.com/
 [irc]:irc://irc.freenode.net/#firepython
 [addon-homepage]: http://github.com/woid/firepython-addon
+[middleware-source]:http://github.com/woid/firepython/tree/master/middleware.py
