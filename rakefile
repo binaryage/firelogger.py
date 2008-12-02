@@ -158,6 +158,8 @@ task :default do
     puts red('need zip on command line (download http://www.info-zip.org/Zip.html)') unless system("zip -r \"#{res}\" *");
   end
   remove_dir(TMP) if File.exist?(TMP) # recursive!
+  
+  puts "\ninstaller is in #{yellow(res)}, enjoy!"
 end
 
 desc "Update PyPI index and upload library sources"
