@@ -6,6 +6,7 @@ import logging
 import re
 import sys
 import time
+import traceback
 
 try:
     from hashlib import md5
@@ -86,12 +87,24 @@ class FirePythonBase(object):
             "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
                      (".%03d" % ((record.created - long(record.created)) * 1000)))
         }
-        props = ["args", "pathname", "lineno", "exc_info", "exc_text", "name", "process", "thread", "threadName"]
+        props = ["args", "pathname", "lineno", "exc_text", "name", "process", "thread", "threadName"]
         for p in props:
             try:
                 data[p] = getattr(record, p)
             except AttributeError:
                 pass
+           
+        try:
+            exc_info = getattr(record, 'exc_info')
+            if exc_info is not None:
+                exc_type = exc_info[0]
+                exc_value = exc_info[1]
+                exc_traceback = exc_info[2]
+                if exc_traceback is not None:
+                    exc_traceback = traceback.extract_tb(exc_traceback)
+                data['exc_info'] = (exc_type, exc_value, exc_traceback)
+        except AttributeError:
+            pass
         return data
 
     def _log_level(self, level):
@@ -189,19 +202,16 @@ class FirePythonWSGI(FirePythonBase):
         if not process:
             return self._app(environ, start_response)
 
-        # collect headers
-        status = "200 OK"
-        headers = []
-        exc_info = None
+        closure = ["200 OK", [], None] # ask why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
         sio = StringIO()
         def faked_start_response(_status, _headers, _exc_info=None):
-            status = _status
-            headers = _headers
-            exc_info = _exc_info
+            closure[0] = _status
+            closure[1] = _headers
+            closure[2] = _exc_info
             return sio.write
 
         def add_header(name, value):
-            headers.append((name, value))
+            closure[1].append((name, value))
 
         self._start()
         # run app
@@ -220,7 +230,7 @@ class FirePythonWSGI(FirePythonBase):
             self._flush_records(add_header)
 
         # start responding
-        write = start_response(status, headers, exc_info)
+        write = start_response(*closure)
         if sio.tell(): # position is not 0
             sio.seek(0)
             write(sio.read())
