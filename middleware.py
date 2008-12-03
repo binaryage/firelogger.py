@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import traceback
+import copy
 
 try:
     from hashlib import md5
@@ -20,7 +21,7 @@ except ImportError:
 
 import firepython
 from firepython.handlers import ThreadBufferedHandler
-from firepython.utils import json_encode
+import jsonpickle
 
 class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
@@ -55,7 +56,7 @@ class FirePythonBase(object):
         return md5('#FirePythonPassword#%s#' % self._password).hexdigest() == password
 
     def _encode(self, data):
-        data = json_encode(data)
+        data = jsonpickle.encode(data, unpicklable=False)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
@@ -77,7 +78,7 @@ class FirePythonBase(object):
         chunks = self._encode({"logs": logs})
         for i, chunk in enumerate(chunks):
             add_header('FirePython-%d' % i, chunk)
-
+        
     def _prepare_log_record(self, record):
         data = {
             "level": self._log_level(record.levelno),
@@ -93,7 +94,7 @@ class FirePythonBase(object):
                 data[p] = getattr(record, p)
             except AttributeError:
                 pass
-           
+        
         try:
             exc_info = getattr(record, 'exc_info')
             if exc_info is not None:

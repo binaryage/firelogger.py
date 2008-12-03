@@ -21,6 +21,7 @@ ADDON = File.expand_path(File.join(ROOT, '..', 'firepython-addon')) # firepython
 FIREFOX = File.join(ADDON, 'firefox')
 DST = File.join(ROOT, 'build')
 TMP = File.join(ROOT, 'tmp')
+JSONPICKLE = File.join(ROOT, 'jsonpickle')
 PYTHON = ROOT
 
 # http://kpumuk.info/ruby-on-rails/colorizing-console-ruby-script-output/
@@ -204,4 +205,35 @@ task :version do
     puts "  #{red("patching had no effect")}"
   end
   exit(0)
+end
+
+# Python is a hostile language for me
+# google app engine is breaking after setting sys.path (various handler caching issues and bugs)
+# witout sys.path I see no other chance than to prepare my own patched version of jsonpickle
+desc "Prepares jsonpicke version"
+task :jsonpickle do
+  repo = ARGV[1] || "/Users/woid/code/jsonpickle-read-only"
+  remove_dir(JSONPICKLE) if File.exists?(JSONPICKLE) # recursive!
+  mkdir(JSONPICKLE)
+  Dir.chdir(JSONPICKLE) do
+    ["COPYING", "README"].each { |file| system("cp \"#{File.join(repo, "src", file)}\" .") }
+    
+    lines = []
+    # bake all into one huge file to get rid of import paths issues
+    # also remove import statements and module prefixes
+    ['__init__.py', 'util.py', 'pickler.py', 'unpickler.py'].each do |filepath|
+      File.open(File.join(repo, "src", "jsonpickle", filepath), 'r') do |f|
+        f.each do |line|
+          line = line.gsub('from jsonpickle.pickler import Pickler', '')
+          line = line.gsub('from jsonpickle.unpickler import Unpickler', '')
+          line = line.gsub('import jsonpickle.util as util', '')
+          line = line.gsub('util.', '')
+          lines << line
+        end
+      end
+    end
+    File.open('__init__.py', "w") do |f|
+      f << lines
+    end
+  end
 end
