@@ -73,8 +73,8 @@ Version 0.3 will also work with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.
 
 ### Also thanks to
 
-* **[Firebug team][firebug-team]** - without these guys the web wouldn't look like today.
-* **[FirePHP authors][firephp-authors]** - a lot of inspiration, good work mates!
+* **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
+* **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
 * **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
 
 # Support
