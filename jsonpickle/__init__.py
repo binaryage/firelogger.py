@@ -424,8 +424,11 @@ class Pickler(object):
                 for v in obj:
                     data.append(self.flatten(v))
             else:
-                for k, v in obj.__dict__.iteritems():
-                    data[str(k)] = self.flatten(v)
+                try:
+                    for k, v in obj.__dict__.iteritems():
+                        data[str(k)] = self.flatten(v)
+                except:
+                    data = str(obj)
             return data
         # else, what else? (classes, methods, functions, old style classes...)
         
