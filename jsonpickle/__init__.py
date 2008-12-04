@@ -412,6 +412,7 @@ class Pickler(object):
             return data
         elif isinstance(obj, object):
             data = {}
+            data['_'] = str(obj)
             module, name = _getclassdetail(obj)
             if self.unpicklable is True:
                 data['classmodule__'] = module
