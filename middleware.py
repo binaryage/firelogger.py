@@ -28,14 +28,14 @@ class FirePythonBase(object):
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
-    
+
     def install_handler(self):
         logger = logging.getLogger(self._logger_name)
         self._handler = ThreadBufferedHandler()
         logger.addHandler(self._handler)
-    
+
     def uninstall_handler(self):
-        if self._handler is None: 
+        if self._handler is None:
             return
         logger = logging.getLogger(self._logger_name)
         logger.removeHandler(self._handler)
@@ -78,7 +78,7 @@ class FirePythonBase(object):
         chunks = self._encode({"logs": logs})
         for i, chunk in enumerate(chunks):
             add_header('FirePython-%d' % i, chunk)
-        
+
     def _prepare_log_record(self, record):
         data = {
             "level": self._log_level(record.levelno),
@@ -94,7 +94,7 @@ class FirePythonBase(object):
                 data[p] = getattr(record, p)
             except AttributeError:
                 pass
-        
+
         try:
             exc_info = getattr(record, 'exc_info')
             if exc_info is not None:
@@ -144,7 +144,7 @@ class FirePythonDjango(FirePythonBase):
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
         self.install_handler()
-        
+
     def __del__(self):
         self.uninstall_handler()
 
@@ -194,7 +194,7 @@ class FirePythonWSGI(FirePythonBase):
 
     def __del__(self):
         self.uninstall_handler()
-        
+
     def __call__(self, environ, start_response):
         process = (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
                    not (self._password and
