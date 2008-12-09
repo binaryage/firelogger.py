@@ -171,10 +171,10 @@ class FirePythonDjango(FirePythonBase):
 
     def process_exception(self, request, exception):
         if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
-            return response
+            return
         if (self._password and
             not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
-            return response
+            return
 
         logging.exception(exception)
 
