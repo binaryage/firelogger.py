@@ -25,6 +25,7 @@ import jsonpickle
 
 class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
+    DEEP_LOCALS = False
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
@@ -111,7 +112,10 @@ class FirePythonBase(object):
                     try:
                         d = {}
                         for k,v in t.tb_frame.f_locals.iteritems():
-                            d[str(k)] = str(v)
+                            if self.DEEP_LOCALS:
+                                d[unicode(k)] = v
+                            else:
+                                d[unicode(k)] = unicode(v)
                         frames.append(d)
                     except:
                         frames.append('?')
