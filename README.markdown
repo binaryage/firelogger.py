@@ -23,11 +23,11 @@ Here is [source repository for firefox addon][addon-homepage] with instructions 
 
 ### Python Library
 
-#### The easy way:
+#### The easy way
 
 ``sudo easy_install firepython``
 
-#### The manual way:
+#### The manual way
 
 Just note, that it depends on simplejson.
 
@@ -41,7 +41,7 @@ Or if your web project uses git for versioning, you may want to be cool and use 
 
 If firepython directory is not on your import paths, you need to add ``firepython`` folder into your ``sys.path``.
 
-## Usage:
+## Usage
 
 ### Django
 
@@ -54,6 +54,11 @@ After installation, enable middleware ``firepython.middleware.FirePythonWSGI``.
 ### Custom usage
 
 Look for inspiration in [middleware.py][middleware-source]
+
+## Real world examples
+
+  * [FirePython added to Bloog][bloog-example] (blog engine for GAE)
+  * [FirePython added to DryDrop][drydrop-example] (GAE hosting engine for GitHubbers && !Pythonists)
 
 # Current State
 
@@ -68,8 +73,8 @@ Version 0.3 will also work with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.
 
 ### Also thanks to
 
-* **[Firebug team][firebug-team]** - without these guys the web wouldn't look like today.
-* **[FirePHP authors][firephp-authors]** - a lot of inspiration, good work mates!
+* **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
+* **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
 * **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
 
 # Support
@@ -125,3 +130,5 @@ IRC channel [#firepython][irc] at freenode
 [addon-homepage]: http://github.com/woid/firepython-addon
 [middleware-source]:http://github.com/woid/firepython/tree/master/middleware.py
 [jsonpickle]:http://code.google.com/p/jsonpickle/
+[bloog-example]:http://github.com/DocSavage/bloog/commit/346e5fb7c1fd87259dc79f2c4ae852badb6f2b79
+[drydrop-example]:http://github.com/woid/drydrop/tree/22aadc0a463ae76e10aaefdf7aee002c7e605793/dryapp/drydrop_handler.py#L326
