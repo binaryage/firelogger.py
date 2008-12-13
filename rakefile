@@ -216,18 +216,20 @@ task :jsonpickle do
   remove_dir(JSONPICKLE) if File.exists?(JSONPICKLE) # recursive!
   mkdir(JSONPICKLE)
   Dir.chdir(JSONPICKLE) do
-    ["COPYING", "README"].each { |file| system("cp \"#{File.join(repo, "src", file)}\" .") }
+    ["COPYING"].each { |file| system("cp \"#{File.join(repo, "src", file)}\" .") }
     
     lines = []
     # bake all into one huge file to get rid of import paths issues
     # also remove import statements and module prefixes
-    ['__init__.py', 'util.py', 'pickler.py', 'unpickler.py'].each do |filepath|
+    ['__init__.py', 'util.py', "tags.py", 'pickler.py', 'unpickler.py'].each do |filepath|
       File.open(File.join(repo, "src", "jsonpickle", filepath), 'r') do |f|
         f.each do |line|
           line = line.gsub('from jsonpickle.pickler import Pickler', '')
           line = line.gsub('from jsonpickle.unpickler import Unpickler', '')
           line = line.gsub('import jsonpickle.util as util', '')
+          line = line.gsub('import jsonpickle.tags as tags', '')
           line = line.gsub('util.', '')
+          line = line.gsub('tags.', '')
           lines << line
         end
       end

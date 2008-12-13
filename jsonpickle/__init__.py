@@ -24,15 +24,21 @@ Use jsonpickle to transform the object into a JSON string.
     
     >>> pickled = jsonpickle.encode(obj)
     >>> print pickled
-    {"classname__": "Thing", "child": null, "name": "A String", "classmodule__": "jsonpickle.tests.classes"}
+    {"py/object": "jsonpickle.tests.classes.Thing", "name": "A String", "child": null}
 
 Use jsonpickle to recreate a Python object from a JSON string
     
     >>> unpickled = jsonpickle.decode(pickled)
-    >>> print unpickled.name
-    A String
+    >>> unpickled.name
+    u'A String'
 
-The new object has the same type and data, but essentially is now a copy of the original.
+.. warning::
+
+    Loading a JSON string from an untrusted source represents a potential
+    security vulnerability.  jsonpickle makes no attempt to sanitize the input. 
+
+The new object has the same type and data, but essentially is now a copy of 
+the original.
     
     >>> obj == unpickled
     False
@@ -55,9 +61,7 @@ added to JSON.
 
 
 __version__ = '0.2.0a'
-__all__ = [
-    'encode', 'decode'
-]
+__all__ = ('encode', 'decode')
 
 
 class JSONPluginMgr(object):
@@ -207,7 +211,12 @@ class JSONPluginMgr(object):
         """
         self._encoder_options[name] = (args, kwargs)
 
+# Initialize a JSONPluginMgr
 json = JSONPluginMgr()
+
+# Export specific JSONPluginMgr methods into the jsonpickle namespace
+set_preferred_backend = json.set_preferred_backend
+set_encoder_options = json.set_encoder_options
 
 
 def encode(value, **kwargs):
@@ -222,7 +231,7 @@ def encode(value, **kwargs):
     >>> encode(36)
     '36'
     """
-    j = Pickler(unpicklable=__isunpicklable(kwargs))
+    j = Pickler(unpicklable=_isunpicklable(kwargs))
     return json.encode(j.flatten(value))
 
 def decode(string):
@@ -236,15 +245,15 @@ def decode(string):
     j = Unpickler()
     return j.restore(json.decode(string))
 
-def __isunpicklable(kw):
+def _isunpicklable(kw):
     """Utility function for finding keyword unpicklable and returning value.
     Default is assumed to be True.
 
-    >>> __isunpicklable({})
+    >>> _isunpicklable({})
     True
-    >>> __isunpicklable({'unpicklable':True})
+    >>> _isunpicklable({'unpicklable':True})
     True
-    >>> __isunpicklable({'unpicklable':False})
+    >>> _isunpicklable({'unpicklable':False})
     False
 
     """
@@ -263,9 +272,44 @@ def __isunpicklable(kw):
 determining the type of an object.
 """
 import time
+import types
+import datetime
 
 COLLECTIONS = set, list, tuple
 PRIMITIVES = str, unicode, int, float, bool, long
+NEEDS_REPR = (datetime.datetime, datetime.time, datetime.date, 
+              datetime.timedelta)
+
+def is_type(obj):
+    """Returns True is obj is a reference to a type.
+
+    >>> is_type(1)
+    False
+
+    >>> is_type(object)
+    True
+
+    >>> class Klass: pass
+    >>> is_type(Klass)
+    True
+    """
+    return type(obj) is types.TypeType or repr(obj).startswith('<class')
+
+def is_object(obj):
+    """Returns True is obj is a reference to an object instance.
+
+    >>> is_object(1)
+    True
+
+    >>> is_object(object())
+    True
+
+    >>> is_object(lambda x: 1)
+    False
+    """
+    return (isinstance(obj, object) and
+            type(obj) is not types.TypeType and
+            type(obj) is not types.FunctionType)
 
 def is_primitive(obj):
     """Helper method to see if the object is a basic data type. Strings, 
@@ -289,20 +333,39 @@ def is_dictionary(obj):
     >>> is_dictionary({'key':'value'})
     True
     """   
-    if type(obj) is dict:
-        return True
-    return False
+    return type(obj) is dict
 
 def is_collection(obj):
     """Helper method to see if the object is a Python collection (list, 
     set, or tuple).
-    
     >>> is_collection([4])
     True
     """
-    if type(obj) in COLLECTIONS:
-        return True
-    return False
+    return type(obj) in COLLECTIONS
+
+def is_list(obj):
+    """Helper method to see if the object is a Python list.
+    
+    >>> is_list([4])
+    True
+    """
+    return type(obj) is list
+
+def is_set(obj):
+    """Helper method to see if the object is a Python set.
+    
+    >>> is_set(set())
+    True
+    """
+    return type(obj) is set
+
+def is_tuple(obj):
+    """Helper method to see if the object is a Python tuple.
+    
+    >>> is_tuple((1,))
+    True
+    """
+    return type(obj) is tuple
 
 def is_dictionary_subclass(obj):
     """Returns True if *obj* is a subclass of the dict type. *obj* must be 
@@ -312,11 +375,9 @@ def is_dictionary_subclass(obj):
     >>> is_dictionary_subclass(Temp())
     True
     """
-    #TODO add UserDict
-    if issubclass(obj.__class__, dict) and not is_dictionary(obj):
-        return True
-    return False
-
+    return (hasattr(obj, '__class__') and
+            issubclass(obj.__class__, dict) and not is_dictionary(obj))
+ 
 def is_collection_subclass(obj):
     """Returns True if *obj* is a subclass of a collection type, such as list
     set, tuple, etc.. *obj* must be a subclass and not the actual builtin, such
@@ -327,9 +388,7 @@ def is_collection_subclass(obj):
     True
     """
     #TODO add UserDict
-    if issubclass(obj.__class__, COLLECTIONS) and not is_collection(obj):
-        return True
-    return False
+    return issubclass(obj.__class__, COLLECTIONS) and not is_collection(obj)
 
 def is_noncomplex(obj):
     """Returns True if *obj* is a special (weird) class, that is complex than 
@@ -341,6 +400,60 @@ def is_noncomplex(obj):
         return True
     return False
 
+def is_repr(obj):
+    """Returns True if the *obj* must be encoded and decoded using the 
+    :func:`repr` function. Including:
+        
+        * :class:`~datetime.datetime`
+        * :class:`~datetime.date`
+        * :class:`~datetime.time`
+        * :class:`~datetime.timedelta`
+    """
+    return isinstance(obj, NEEDS_REPR)
+
+def is_function(obj):
+    """Returns true if passed a function
+
+    >>> is_function(lambda x: 1)
+    True
+
+    >>> is_function(locals)
+    True
+
+    >>> def method(): pass
+    >>> is_function(method)
+    True
+
+    >>> is_function(1)
+    False
+    """
+    if type(obj) is types.FunctionType:
+        return True
+    if not is_object(obj):
+        return False
+    if not hasattr(obj, '__class__'):
+        return False
+    module = obj.__class__.__module__
+    name = obj.__class__.__name__
+    return (module == '__builtin__' and
+            name in ('function', 'builtin_function_or_method'))
+"""The jsonpickle.tags module provides the custom tags
+used for pickling and unpickling Python objects.
+
+These tags are keys into the flattened dictionaries
+created by the Pickler class.  The Unpickler uses
+these custom key names to identify dictionaries
+that need to be specially handled.
+"""
+OBJECT = 'py/object'
+TYPE   = 'py/type'
+REPR   = 'py/repr'
+REF    = 'py/ref'
+TUPLE  = 'py/tuple'
+SET    = 'py/set'
+
+# All reserved tag names
+RESERVED = set([OBJECT, TYPE, REPR, REF, TUPLE, SET])
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2008 John Paulett (john -at- 7oars.com)
@@ -348,6 +461,8 @@ def is_noncomplex(obj):
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution.
+import types
+
 
 
 
@@ -365,7 +480,41 @@ class Pickler(object):
     
     def __init__(self, unpicklable=True):
         self.unpicklable = unpicklable
-    
+        ## The current recursion depth
+        self._depth = 0
+        ## Maps id(obj) to reference names
+        self._objs = {}
+        ## The namestack grows whenever we recurse into a child object
+        self._namestack = []
+
+    def _reset(self):
+        self._objs = {}
+        self._namestack = []
+
+    def _push(self):
+        """Steps down one level in the namespace.
+        """
+        self._depth += 1
+
+    def _pop(self, value):
+        """Step up one level in the namespace and return the value.
+        If we're at the root, reset the pickler's state.
+        """
+        self._depth -= 1
+        if self._depth == 0:
+            self._reset()
+        return value
+
+    def _mkref(self, obj):
+        objid = id(obj)
+        if objid not in self._objs:
+            self._objs[objid] = '/' + '/'.join(self._namestack)
+            return True
+        return False
+
+    def _getref(self, obj):
+        return {REF: self._objs.get(id(obj))}
+
     def flatten(self, obj):
         """Takes an object and returns a JSON-safe representation of it.
         
@@ -391,48 +540,92 @@ class Pickler(object):
         False
         >>> p.flatten([1, 2, 3, 4])
         [1, 2, 3, 4]
-        >>> p.flatten((1,))
-        (1,)
+        >>> p.flatten((1,2,))[TUPLE]
+        [1, 2]
         >>> p.flatten({'key': 'value'})
         {'key': 'value'}
         """
-        
+
+        self._push()
+
         if is_primitive(obj):
-            return obj
-        elif is_collection(obj):
-            data = [] # obj.__class__()
-            for v in obj:
-                data.append(self.flatten(v))
-            return obj.__class__(data)
-            #TODO handle tuple and sets
-        elif is_dictionary(obj):
-            data = obj.__class__()
-            for k, v in obj.iteritems():
-                data[k] = self.flatten(v)
-            return data
-        elif isinstance(obj, object):
+            return self._pop(obj)
+
+        if is_list(obj):
+            return self._pop([ self.flatten(v) for v in obj ])
+
+        # We handle tuples and sets by encoding them in a "(tuple|set)dict"
+        if is_tuple(obj):
+            return self._pop({TUPLE: [ self.flatten(v) for v in obj ]})
+
+        if is_set(obj):
+            return self._pop({SET: [ self.flatten(v) for v in obj ]})
+
+        if is_dictionary(obj):
+            return self._pop(self._flatten_dict_obj(obj, obj.__class__()))
+
+        if is_type(obj):
+            return self._pop(_mktyperef(obj))
+
+        if is_object(obj):
             data = {}
-            data['_'] = str(obj)
-            module, name = _getclassdetail(obj)
-            if self.unpicklable is True:
-                data['classmodule__'] = module
-                data['classname__'] = name 
-            if is_dictionary_subclass(obj):
-                for k, v in obj.iteritems():
-                    data[k] = self.flatten(v)
-            elif is_noncomplex(obj):
-                data = [] # obj.__class__()
-                for v in obj:
-                    data.append(self.flatten(v))
+            has_class = hasattr(obj, '__class__')
+            has_dict = hasattr(obj, '__dict__')
+            if self._mkref(obj):
+                if has_class and not is_repr(obj):
+                    module, name = _getclassdetail(obj)
+                    if self.unpicklable is True:
+                        data[OBJECT] = '%s.%s' % (module, name)
+
+                if is_repr(obj):
+                    if self.unpicklable is True:
+                        data[REPR] = '%s/%s' % (obj.__class__.__module__,
+                                                     repr(obj))
+                    else:
+                        data = str(obj)
+                    return self._pop(data)
+
+                if is_dictionary_subclass(obj):
+                    return self._pop(self._flatten_dict_obj(obj, data))
+
+                if is_noncomplex(obj):
+                    return self._pop([self.flatten(v) for v in obj])
+
+                if has_dict:
+                    return self._pop(self._flatten_dict_obj(obj.__dict__, data))
             else:
-                try:
-                    for k, v in obj.__dict__.iteritems():
-                        data[str(k)] = self.flatten(v)
-                except:
-                    data = str(obj)
-            return data
-        # else, what else? (classes, methods, functions, old style classes...)
-        
+                # We've seen this object before so place an object
+                # reference tag in the data. This avoids infinite recursion
+                # when processing cyclical objects.
+                return self._pop(self._getref(obj))
+
+            return self._pop(data)
+        # else, what else? (methods, functions, old style classes...)
+
+    def _flatten_dict_obj(self, obj, data):
+        """_flatten_dict_obj recursively calls to flatten() on a dictionary's values.
+        and places them into data.
+        """
+        for k, v in obj.iteritems():
+            if is_function(v):
+                continue
+            self._namestack.append(str(k))
+            data[str(k)] = self.flatten(v)
+            self._namestack.pop()
+        return data
+
+def _mktyperef(obj):
+    """Returns a typeref dictionary.  This is used to implement referencing.
+
+    >>> from jsonpickle import tags
+    >>> _mktyperef(AssertionError)[TYPE].rsplit('.', 1)[0]
+    'exceptions'
+
+    >>> _mktyperef(AssertionError)[TYPE].rsplit('.', 1)[-1]
+    'AssertionError'
+    """
+    return {TYPE: '%s.%s' % (obj.__module__, obj.__name__)}
+
 def _getclassdetail(obj):
     """Helper class to return the class of an object.
     
@@ -446,11 +639,10 @@ def _getclassdetail(obj):
     >>> _getclassdetail(False)
     ('__builtin__', 'bool')
     """
-    cls = getattr(obj, '__class__')
+    cls = obj.__class__
     module = getattr(cls, '__module__')
     name = getattr(cls, '__name__')
     return module, name
-    
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2008 John Paulett (john -at- 7oars.com)
@@ -462,7 +654,37 @@ def _getclassdetail(obj):
 import sys
 
 
+
+
 class Unpickler(object):
+    def __init__(self):
+        ## The current recursion depth
+        self._depth = 0
+        ## Maps reference names to object instances
+        self._namedict = {}
+        ## The namestack grows whenever we recurse into a child object
+        self._namestack = []
+
+    def _reset(self):
+        """Resets the object's internal state.
+        """
+        self._namedict = {}
+        self._namestack = []
+
+    def _push(self):
+        """Steps down one level in the namespace.
+        """
+        self._depth += 1
+
+    def _pop(self, value):
+        """Step up one level in the namespace and return the value.
+        If we're at the root, reset the unpickler's state.
+        """
+        self._depth -= 1
+        if self._depth == 0:
+            self._reset()
+        return value
+
     def restore(self, obj):
         """Restores a flattened object to its original python state.
         
@@ -474,63 +696,165 @@ class Unpickler(object):
         >>> u.restore({'key': 'value'})
         {'key': 'value'}
         """
-        if self._isclassdict(obj):
-            cls = self._loadclass(obj['classmodule__'], obj['classname__'])
-            
+        self._push()
+
+        if has_tag(obj, REF):
+            return self._pop(self._namedict.get(obj[REF]))
+
+        if has_tag(obj, TYPE):
+            typeref = loadclass(obj[TYPE])
+            if not typeref:
+                return self._pop(obj)
+            return self._pop(typeref)
+
+        if has_tag(obj, REPR):
+            return self._pop(loadrepr(obj[REPR]))
+
+        if has_tag(obj, OBJECT):
+
+            cls = loadclass(obj[OBJECT])
+            if not cls:
+                return self._pop(obj)
             try:
                 instance = object.__new__(cls)
             except TypeError:
                 # old-style classes
-                instance = cls()
+                try:
+                    instance = cls()
+                except TypeError:
+                    # fail gracefully if the constructor requires arguments
+                    self._mkref(obj)
+                    return self._pop(obj)
             
+            # keep a obj->name mapping for use in the _isobjref() case
+            self._mkref(instance)
+
             for k, v in obj.iteritems():
-                # ignore the fake attribute
-                if k in ('classmodule__', 'classname__'):
+                # ignore the reserved attribute
+                if k in RESERVED:
                     continue
+                self._namestack.append(k)
+                # step into the namespace
                 value = self.restore(v)
                 if (is_noncomplex(instance) or
                         is_dictionary_subclass(instance)):
                     instance[k] = value
                 else:
                     instance.__dict__[k] = value
-            return instance
-        elif is_collection(obj):
-            # currently restores all collections to lists, even sets and tuples
-            data = []
-            for v in obj:
-                data.append(self.restore(v))
-            return data
-        elif is_dictionary(obj):
+                # step out
+                self._namestack.pop()
+            return self._pop(instance)
+
+        if is_list(obj):
+            return self._pop([self.restore(v) for v in obj])
+
+        if has_tag(obj, TUPLE):
+            return self._pop(tuple([self.restore(v) for v in obj[TUPLE]]))
+
+        if has_tag(obj, SET):
+            return self._pop(set([self.restore(v) for v in obj[SET]]))
+
+        if is_dictionary(obj):
             data = {}
             for k, v in obj.iteritems():
+                self._namestack.append(k)
                 data[k] = self.restore(v)
-            return data
-        else:
-            return obj
-        
-    def _loadclass(self, module, name):
-        """Loads the module and returns the class.
-        
+                self._namestack.pop()
+            return self._pop(data)
+
+        return self._pop(obj)
+
+    def _refname(self):
+        """Calculates the name of the current location in the JSON stack.
+
+        This is called as jsonpickle traverses the object structure to
+        create references to previously-traversed objects.  This allows
+        cyclical data structures such as doubly-linked lists.
+        jsonpickle ensures that duplicate python references to the same
+        object results in only a single JSON object definition and
+        special reference tags to represent each reference.
+
         >>> u = Unpickler()
-        >>> u._loadclass('jsonpickle.tests.classes','Thing')
-        <class 'jsonpickle.tests.classes.Thing'>
+        >>> u._namestack = []
+        >>> u._refname()
+        '/'
+
+        >>> u._namestack = ['a']
+        >>> u._refname()
+        '/a'
+
+        >>> u._namestack = ['a', 'b']
+        >>> u._refname()
+        '/a/b'
+
         """
-        __import__(module)
-        mod = sys.modules[module]
-        cls = getattr(mod, name)
-        return cls
+        return '/' + '/'.join(self._namestack)
+
+    def _mkref(self, obj):
+        """
+        >>> from jsonpickle.tests.classes import Thing
+        >>> thing = Thing('referenced-thing')
+        >>> u = Unpickler()
+        >>> u._mkref(thing)
+        '/'
+        >>> u._namedict['/']
+        jsonpickle.tests.classes.Thing("referenced-thing")
+
+        """
+        name = self._refname()
+        if name not in self._namedict:
+            self._namedict[name] = obj
+        return name
+
+def loadclass(module_and_name):
+    """Loads the module and returns the class.
     
-    def _isclassdict(self, obj):
-        """Helper class that tests to see if the obj is a flattened object
-        
-        >>> u = Unpickler()
-        >>> u._isclassdict({'classmodule__':'__builtin__', 'classname__':'int'})
-        True
-        >>> u._isclassdict({'key':'value'})    
-        False
-        >>> u._isclassdict(25)    
-        False
-        """
-        if type(obj) is dict and 'classmodule__' in obj and 'classname__' in obj:
-            return True
-        return False
+    >>> loadclass('jsonpickle.tests.classes.Thing')
+    <class 'jsonpickle.tests.classes.Thing'>
+
+    >>> loadclass('example.module.does.not.exist.Missing')
+    
+
+    >>> loadclass('jsonpickle.tests.classes.MissingThing')
+    
+
+    """
+    try:
+        module, name = module_and_name.rsplit('.', 1)
+        __import__(module)
+        return getattr(sys.modules[module], name)
+    except:
+        return None
+
+def loadrepr(reprstr):
+    """Returns an instance of the object from the object's repr() string. It
+    involves the dynamic specification of code.
+    
+    >>> from jsonpickle import tags
+    >>> loadrepr('jsonpickle.tests.classes/jsonpickle.tests.classes.Thing("json")')
+    jsonpickle.tests.classes.Thing("json")
+
+    """
+    module, evalstr = reprstr.split('/')
+    mylocals = locals()
+    localname = module
+    if '.' in localname:
+        localname = module.split('.', 1)[0]
+    mylocals[localname] = __import__(module)
+    return eval(evalstr)
+
+def has_tag(obj, tag):
+    """Helper class that tests to see if the obj is a dictionary
+    and contains a particular key/tag.
+
+    >>> obj = {'test': 1}
+    >>> has_tag(obj, 'test')
+    True
+    >>> has_tag(obj, 'fail')
+    False
+
+    >>> has_tag(42, 'fail')
+    False
+
+    """
+    return type(obj) is dict and tag in obj
