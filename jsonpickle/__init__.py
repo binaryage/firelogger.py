@@ -569,6 +569,7 @@ class Pickler(object):
 
         if is_object(obj):
             data = {}
+            data["_"] = unicode(obj)
             has_class = hasattr(obj, '__class__')
             has_dict = hasattr(obj, '__dict__')
             if self._mkref(obj):
