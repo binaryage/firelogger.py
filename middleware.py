@@ -104,6 +104,19 @@ class FirePythonBase(object):
                 if exc_traceback is not None:
                     exc_traceback = traceback.extract_tb(exc_traceback)
                 data['exc_info'] = (exc_type, exc_value, exc_traceback)
+                
+                frames = []
+                t = exc_info[2]
+                while t:
+                    try:
+                        d = {}
+                        for k,v in t.tb_frame.f_locals.iteritems():
+                            d[str(k)] = str(v)
+                        frames.append(d)
+                    except:
+                        frames.append('?')
+                    t = t.tb_next
+                data['exc_frames'] = frames
         except AttributeError:
             pass
         return data
