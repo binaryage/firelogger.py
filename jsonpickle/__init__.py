@@ -231,7 +231,7 @@ def encode(value, **kwargs):
     >>> encode(36)
     '36'
     """
-    j = Pickler(unpicklable=_isunpicklable(kwargs))
+    j = Pickler(unpicklable=_isunpicklable(kwargs), max_depth=kwargs.get('max_depth', None))
     return json.encode(j.flatten(value))
 
 def decode(string):
@@ -478,10 +478,12 @@ class Pickler(object):
     'hello world'
     """
     
-    def __init__(self, unpicklable=True):
+    def __init__(self, unpicklable=True, max_depth=None):
         self.unpicklable = unpicklable
         ## The current recursion depth
         self._depth = 0
+        ## The maximal recursion depth
+        self._max_depth = max_depth
         ## Maps id(obj) to reference names
         self._objs = {}
         ## The namestack grows whenever we recurse into a child object
@@ -547,6 +549,9 @@ class Pickler(object):
         """
 
         self._push()
+        
+        if self._max_depth is not None and self._depth == self._max_depth:
+            return self._pop(repr(obj))
 
         if is_primitive(obj):
             return self._pop(obj)
@@ -569,7 +574,7 @@ class Pickler(object):
 
         if is_object(obj):
             data = {}
-            data["_"] = unicode(obj)
+            data["_"] = repr(obj)
             has_class = hasattr(obj, '__class__')
             has_dict = hasattr(obj, '__dict__')
             if self._mkref(obj):
@@ -583,7 +588,7 @@ class Pickler(object):
                         data[REPR] = '%s/%s' % (obj.__class__.__module__,
                                                      repr(obj))
                     else:
-                        data = str(obj)
+                        data = unicode(obj)
                     return self._pop(data)
 
                 if is_dictionary_subclass(obj):
@@ -610,8 +615,10 @@ class Pickler(object):
         for k, v in obj.iteritems():
             if is_function(v):
                 continue
-            self._namestack.append(str(k))
-            data[str(k)] = self.flatten(v)
+            if type(k) not in types.StringTypes:
+                k = repr(k)
+            self._namestack.append(k)
+            data[k] = self.flatten(v)
             self._namestack.pop()
         return data
 

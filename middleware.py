@@ -25,7 +25,8 @@ import jsonpickle
 
 class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
-    DEEP_LOCALS = False
+    DEEP_LOCALS = True
+    JSONPICKLE_DEPTH = 10
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
@@ -57,7 +58,7 @@ class FirePythonBase(object):
         return md5('#FirePythonPassword#%s#' % self._password).hexdigest() == password
 
     def _encode(self, data):
-        data = jsonpickle.encode(data, unpicklable=False)
+        data = jsonpickle.encode(data, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
@@ -115,7 +116,7 @@ class FirePythonBase(object):
                             if self.DEEP_LOCALS:
                                 d[unicode(k)] = v
                             else:
-                                d[unicode(k)] = unicode(v)
+                                d[unicode(k)] = repr(v)
                         frames.append(d)
                     except:
                         frames.append('?')
