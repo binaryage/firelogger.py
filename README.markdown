@@ -35,7 +35,7 @@ Clone [project from github][homepage] in your project directory.
 
 Or if your web project uses git for versioning, you may want to be cool and use firepython as a submodule of your git repository.
   
-``git submodule add git://github.com/woid/firepython.git firepython``
+``git submodule add git://github.com/darwin/firepython.git firepython``
 
 (you may want to replace last parameter with real path in your repo)
 
@@ -113,11 +113,11 @@ IRC channel [#firepython][irc] at freenode
   * log record searching
   * opening files in TextMate (click to timestamp field)
 
-[screenshot]: http://github.com/woid/firepython-addon/tree/master/support/screenshot.png?raw=true "FirePython in action"
+[screenshot]: http://github.com/darwin/firepython-addon/tree/master/support/screenshot.png?raw=true "FirePython in action"
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
 [firepython]: https://addons.mozilla.org/en-US/firefox/addon/9602
-[homepage]: http://github.com/woid/firepython
+[homepage]: http://github.com/darwin/firepython
 [contact]: mailto:antonin@hildebrand.cz
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
 [support]: http://firepython.uservoice.com/
@@ -127,8 +127,8 @@ IRC channel [#firepython][irc] at freenode
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
 [irc]:irc://irc.freenode.net/#firepython
-[addon-homepage]: http://github.com/woid/firepython-addon
-[middleware-source]:http://github.com/woid/firepython/tree/master/middleware.py
+[addon-homepage]: http://github.com/darwin/firepython-addon
+[middleware-source]:http://github.com/darwin/firepython/tree/master/middleware.py
 [jsonpickle]:http://code.google.com/p/jsonpickle/
 [bloog-example]:http://github.com/DocSavage/bloog/commit/346e5fb7c1fd87259dc79f2c4ae852badb6f2b79
-[drydrop-example]:http://github.com/woid/drydrop/tree/22aadc0a463ae76e10aaefdf7aee002c7e605793/dryapp/drydrop_handler.py#L326
+[drydrop-example]:http://github.com/darwin/drydrop/tree/22aadc0a463ae76e10aaefdf7aee002c7e605793/dryapp/drydrop_handler.py#L326
