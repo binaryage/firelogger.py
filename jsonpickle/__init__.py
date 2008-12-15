@@ -219,19 +219,36 @@ set_preferred_backend = json.set_preferred_backend
 set_encoder_options = json.set_encoder_options
 
 
-def encode(value, **kwargs):
+def encode(value, unpicklable=True, max_depth=None, **kwargs):
     """Returns a JSON formatted representation of value, a Python object.
 
-    Optionally takes a keyword argument unpicklable.  If set to False,
-    the output does not contain the information necessary to turn
-    the json back into Python.
+    The keyword argument 'unpicklable' defaults to True.
+    If set to False, the output will not contain the information
+    necessary to turn the JSON data back into Python objects.
+
+    The keyword argument 'max_depth' defaults to None.
+    If set to a non-negative integer then jsonpickle will not recurse
+    deeper than 'max_depth' steps into the object.  Anything deeper
+    than 'max_depth' is represented using a Python repr() of the object.
 
     >>> encode('my string')
     '"my string"'
     >>> encode(36)
     '36'
+
+    >>> encode({'foo': True})
+    '{"foo": true}'
+
+    >>> encode({'foo': True}, max_depth=0)
+    '"{\\'foo\\': True}"'
+
+    >>> encode({'foo': True}, max_depth=1)
+    '{"foo": "True"}'
+
+
     """
-    j = Pickler(unpicklable=_isunpicklable(kwargs), max_depth=kwargs.get('max_depth', None))
+    j = Pickler(unpicklable=unpicklable,
+                max_depth=max_depth)
     return json.encode(j.flatten(value))
 
 def decode(string):
@@ -244,22 +261,6 @@ def decode(string):
     """
     j = Unpickler()
     return j.restore(json.decode(string))
-
-def _isunpicklable(kw):
-    """Utility function for finding keyword unpicklable and returning value.
-    Default is assumed to be True.
-
-    >>> _isunpicklable({})
-    True
-    >>> _isunpicklable({'unpicklable':True})
-    True
-    >>> _isunpicklable({'unpicklable':False})
-    False
-
-    """
-    if 'unpicklable' in kw and not kw['unpicklable']:
-        return False
-    return True
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2008 John Paulett (john -at- 7oars.com)
@@ -473,6 +474,11 @@ class Pickler(object):
     the objects into object types beyond what the standard simplejson
     library supports.
 
+    Setting max_depth to a negative number means there is no
+    limit to the depth jsonpickle should recurse into an
+    object.  Setting it to zero or higher places a hard limit
+    on how deep jsonpickle recurses into objects, dictionaries, etc.
+
     >>> p = Pickler()
     >>> p.flatten('hello world')
     'hello world'
@@ -481,7 +487,7 @@ class Pickler(object):
     def __init__(self, unpicklable=True, max_depth=None):
         self.unpicklable = unpicklable
         ## The current recursion depth
-        self._depth = 0
+        self._depth = -1
         ## The maximal recursion depth
         self._max_depth = max_depth
         ## Maps id(obj) to reference names
@@ -503,7 +509,7 @@ class Pickler(object):
         If we're at the root, reset the pickler's state.
         """
         self._depth -= 1
-        if self._depth == 0:
+        if self._depth == -1:
             self._reset()
         return value
 
@@ -550,7 +556,7 @@ class Pickler(object):
 
         self._push()
         
-        if self._max_depth is not None and self._depth == self._max_depth:
+        if self._depth == self._max_depth:
             return self._pop(repr(obj))
 
         if is_primitive(obj):
@@ -574,7 +580,7 @@ class Pickler(object):
 
         if is_object(obj):
             data = {}
-            data["_"] = repr(obj)
+            data['_'] = repr(obj)
             has_class = hasattr(obj, '__class__')
             has_dict = hasattr(obj, '__dict__')
             if self._mkref(obj):
