@@ -26,7 +26,7 @@ import jsonpickle
 class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
     DEEP_LOCALS = True
-    JSONPICKLE_DEPTH = 10
+    JSONPICKLE_DEPTH = 8
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
