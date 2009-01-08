@@ -175,7 +175,7 @@ class FirePythonDjango(FirePythonBase):
         from django.conf import settings
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
-        self._check_agent = getattr(settings, 'FIREPYTHON_CHECK_AGENT', None)
+        self._check_agent = getattr(settings, 'FIREPYTHON_CHECK_AGENT', True)
         self.install_handler()
 
     def __del__(self):
@@ -230,11 +230,10 @@ class FirePythonWSGI(FirePythonBase):
         self.uninstall_handler()
 
     def __call__(self, environ, start_response):
-        process = (not self._check_agent or self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
-                   not (self._password and
-                        not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', ''))))
+        if self._check_agent and not self._ua_check(environ.get('HTTP_USER_AGENT', '')):
+            return self._app(environ, start_response)
         
-        if not process:
+        if self._password and not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', '')):
             return self._app(environ, start_response)
 
         closure = ["200 OK", [], None] # ask why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
