@@ -8,11 +8,7 @@ import sys
 import time
 import traceback
 import copy
-
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
+import random
 
 try:
     from cStringIO import StringIO
@@ -22,9 +18,11 @@ except ImportError:
 import firepython
 from firepython.handlers import ThreadBufferedHandler
 import jsonpickle
+import firepython.utils
 
 class FirePythonBase(object):
-    FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)')
+    FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)', re.IGNORECASE)
+    FIREPYTHON_HEADER = re.compile(r'^FirePython', re.IGNORECASE)
     DEEP_LOCALS = True
     JSONPICKLE_DEPTH = 8
 
@@ -52,16 +50,24 @@ class FirePythonBase(object):
             logging.warning('FireBug part of FirePython is version %s, but Python part is %s', version, firepython.__version__)
         return True
 
-    def _password_check(self, password):
+    def _password_check(self, token):
         if self._password is None:
             raise Exception("self._password must be set!")
-        return md5('#FirePythonPassword#%s#' % self._password).hexdigest() == password
+        return firepython.utils.get_auth_token(self._password) == token
 
     def _encode(self, data):
         data = jsonpickle.encode(data, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
+    
+    def republish(self, headers):
+        firepython_headers = []
+        for key, value in headers.iteritems():
+            if self.FIREPYTHON_HEADER.match(key):
+                firepython_headers.append((key, value))
+        
+        self._handler.republish(firepython_headers)
 
     def _flush_records(self, add_header):
         """
@@ -73,13 +79,20 @@ class FirePythonBase(object):
 
         records = self._handler.get_records()
         self._handler.clear_records()
+        republished = self._handler.get_republished()
+        self._handler.clear_republished()
+        
+        for name, value in republished:
+            add_header(name, value)
+        
         logs = []
         for record in records:
             logs.append(self._prepare_log_record(record))
 
         chunks = self._encode({"logs": logs})
+        guid = "%08x" % random.randint(0,0xFFFFFFFF)
         for i, chunk in enumerate(chunks):
-            add_header('FirePython-%d' % i, chunk)
+            add_header('FirePython-%s-%d' % (guid, i), chunk)
 
     def _prepare_log_record(self, record):
         data = {
@@ -155,19 +168,21 @@ class FirePythonDjango(FirePythonBase):
     Optional settings:
     Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs with password.
     Set ``FIREPYTHON_LOGGER_NAME`` to specific logger name you want to monitor.
+    Set ``FIREPYTHON_CHECK_AGENT`` to False for prevent server to check presence of firepython in user-agent HTTP header.
     """
 
     def __init__(self):
         from django.conf import settings
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
+        self._check_agent = getattr(settings, 'FIREPYTHON_CHECK_AGENT', None)
         self.install_handler()
 
     def __del__(self):
         self.uninstall_handler()
 
     def process_request(self, request):
-        if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
+        if self._check_agent and not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
             return
 
         if (self._password and
@@ -204,20 +219,21 @@ class FirePythonWSGI(FirePythonBase):
     Supply an application object and an optional password to enable password
     protection. Also logger name may be specified.
     """
-    def __init__(self, app, password=None, logger_name=None):
+    def __init__(self, app, password=None, logger_name=None, check_agent=True):
         self._app = app
         self._password = password
         self._logger_name = logger_name
+        self._check_agent = check_agent
         self.install_handler()
 
     def __del__(self):
         self.uninstall_handler()
 
     def __call__(self, environ, start_response):
-        process = (self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
+        process = (not self._check_agent or self._ua_check(environ.get('HTTP_USER_AGENT', '')) and
                    not (self._password and
                         not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', ''))))
-
+        
         if not process:
             return self._app(environ, start_response)
 

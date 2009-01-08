@@ -19,6 +19,7 @@ class ThreadBufferedHandler(Handler):
         Handler.__init__(self)
         self.records = {} # dictionary (Thread -> list of records)
         self._enabled = {} # dictionary (Thread -> enabled/disabled)
+        self.republished = {} # dictionary (Thread -> list of tuples (header_name, header_value) )
 
     def start(self, thread=None):
         if not thread and threading_supported:
@@ -60,3 +61,21 @@ class ThreadBufferedHandler(Handler):
             thread = threading.currentThread()
         if thread in self.records:
             del self.records[thread]
+    
+    def republish(self, headers):
+        """ Appends republished firepython headers for the current thread. """
+        if self.is_enabled():
+            self.get_republished().extend(headers)
+    
+    def get_republished(self, thread=None):
+        if not thread and threading_supported:
+            thread = threading.currentThread()
+        if thread not in self.republished:
+            self.republished[thread] = []
+        return self.republished[thread]
+    
+    def clear_republished(self, thread=None):
+        if not thread and threading_supported:
+            thread = threading.currentThread()
+        if thread in self.republished:
+            del self.republished[thread]    
