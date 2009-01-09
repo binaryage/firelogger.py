@@ -18,6 +18,10 @@ except ImportError:
 import firepython
 from firepython.handlers import ThreadBufferedHandler
 import jsonpickle
+# add a new backed jsonpickle for Django
+# jsonpickle will attempt to import this if default jsonpickle libraries are not present
+jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
+
 import firepython.utils
 
 class FirePythonBase(object):
