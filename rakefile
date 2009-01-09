@@ -212,7 +212,7 @@ end
 # witout sys.path I see no other chance than to prepare my own patched version of jsonpickle
 desc "Prepares jsonpicke version"
 task :jsonpickle do
-  repo = ARGV[1] || "/Users/woid/code/jsonpickle-read-only"
+  repo = ARGV[1] || File.expand_path("~/code/jsonpickle-read-only")
   remove_dir(JSONPICKLE) if File.exists?(JSONPICKLE) # recursive!
   mkdir(JSONPICKLE)
   Dir.chdir(JSONPICKLE) do
