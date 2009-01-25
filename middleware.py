@@ -28,6 +28,7 @@ class FirePythonBase(object):
     FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)', re.IGNORECASE)
     FIREPYTHON_HEADER = re.compile(r'^FirePython', re.IGNORECASE)
     DEEP_LOCALS = True
+    RAZOR_MODE = False
     JSONPICKLE_DEPTH = 8
 
     def __init__(self):
@@ -58,9 +59,39 @@ class FirePythonBase(object):
         if self._password is None:
             raise Exception("self._password must be set!")
         return firepython.utils.get_auth_token(self._password) == token
+    
+    def _sanitize_exc_info(self, exc_info):
+        if exc_info==None:
+            return ("?", "No exception info available", [])
+        exc_type = exc_info[0]
+        exc_value = exc_info[1]
+        exc_traceback = exc_info[2]
+        if exc_traceback is not None:
+            exc_traceback = traceback.extract_tb(exc_traceback)
+        return (exc_type, exc_value, exc_traceback)
+    
+    def _handle_internal_exception(self, e):
+        if self.RAZOR_MODE: # in razor mode hurt web server
+            raise e
+        # in non-razor mode report internal error to firepython addon
+        exc_info = self._sanitize_exc_info(sys.exc_info())
+        return {"message": "Internal FirePython error: %s" % unicode(e), "exc_info": exc_info}
 
-    def _encode(self, data):
-        data = jsonpickle.encode(data, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
+    def _encode(self, logs, errors):
+        if errors:
+            data = {"logs": logs, "errors": errors}
+        else:
+            data = {"logs": logs }
+        try:
+            data = jsonpickle.encode(data, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
+        except Exception, e:
+            # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
+            errors = [self._handle_internal_exception(e)]
+            try:
+                data = jsonpickle.encode({"errors": errors }, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
+            except Exception, e:
+                # even unable to serialize error message
+                data = jsonpickle.encode({"errors": { "message": "FirePython has a really bad day :-(" } }, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
@@ -90,10 +121,15 @@ class FirePythonBase(object):
             add_header(name, value)
         
         logs = []
+        errors = []
         for record in records:
-            logs.append(self._prepare_log_record(record))
+            try:
+                logs.append(self._prepare_log_record(record))
+            except Exception, e: 
+                # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
+                errors.append(self._handle_internal_exception(e))
 
-        chunks = self._encode({"logs": logs})
+        chunks = self._encode(logs, errors)
         guid = "%08x" % random.randint(0,0xFFFFFFFF)
         for i, chunk in enumerate(chunks):
             add_header('FirePython-%s-%d' % (guid, i), chunk)
@@ -117,12 +153,7 @@ class FirePythonBase(object):
         try:
             exc_info = getattr(record, 'exc_info')
             if exc_info is not None:
-                exc_type = exc_info[0]
-                exc_value = exc_info[1]
-                exc_traceback = exc_info[2]
-                if exc_traceback is not None:
-                    exc_traceback = traceback.extract_tb(exc_traceback)
-                data['exc_info'] = (exc_type, exc_value, exc_traceback)
+                data['exc_info'] = self._sanitize_exc_info(exc_info)
                 
                 frames = []
                 t = exc_info[2]
