@@ -78,4 +78,4 @@ class ThreadBufferedHandler(Handler):
         if not thread and threading_supported:
             thread = threading.currentThread()
         if thread in self.republished:
-            del self.republished[thread]    
+            del self.republished[thread]
