@@ -12,32 +12,58 @@ You definitely need [Firebug 1.2 or higher][firebug].
 
 ## Installation
 
-### Firefox Addon
+### Version 0.2
+
+Version 0.2 is quite outdated (November 2008). 
+I haven't made time to do proper release of 0.3 yet. 
+Are you adventurous? Skip this and check installation of latest version from sources in next section.
+
+#### Firefox Addon
 Preferred way is to install this firefox extension via addons.mozilla.com.
 The latest version is [available here][firepython].
 
 Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
 In this case you may [try workaround][workaround].
 
-Here is [source repository for firefox addon][addon-homepage] with instructions how to install bleeding edge version.
-
-### Python Library
-
-#### The easy way
+#### Python Library
 
 ``sudo easy_install firepython``
 
-#### The manual way
+### Latest version from sources
 
-Just note, that it depends on simplejson.
+#### Firefox Addon
+
+If you want to install latest addon from sources, you need to build it. 
+It should be simple, but make sure you have these tools on your paths:
+
+* git
+* zip
+* ruby and rake
+
+##### Build steps:
+
+    git clone git://github.com/darwin/firepython-addon.git
+    git clone git://github.com/darwin/firepython.git
+    cd firepython
+    rake
+  
+After that your XPI should be available in ``build/firepython-X.Y.xpi``.
+
+You should be able to install XPI file into Firefox: ``File -> Open File`` ... and browse for ``firepython-X.Y.xpi``.
+
+Remember, that you should be also using latest FirePython library on server-side (see next section).
+
+#### Python Library
+
+Just note, that it depends on simplejson (or some other json parsing library needed by [jsonpickle][jsonpickle]).
 
 Clone [project from github][homepage] in your project directory.
 
 Or if your web project uses git for versioning, you may want to be cool and use firepython as a submodule of your git repository.
   
-``git submodule add git://github.com/darwin/firepython.git firepython``
+``git submodule add git://github.com/darwin/firepython.git relative/path/to/firepython``
 
-(you may want to replace last parameter with real path in your repo)
+Note: you may want to replace last parameter with relative path in your repo.
 
 If firepython directory is not on your import paths, you need to add ``firepython`` folder into your ``sys.path``.
 
@@ -58,24 +84,26 @@ Look for inspiration in [middleware.py][middleware-source]
 ## Real world examples
 
   * [FirePython added to Bloog][bloog-example] (blog engine for GAE)
+  
   * [FirePython added to DryDrop][drydrop-example] (GAE hosting engine for GitHubbers && !Pythonists)
 
 # Current State
 
-Version 0.2 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
+  * Version 0.3 works with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.1 + Firefox 3.0.4. Btw. I'm running it with Firefox 3.2 (Nightly) + Firebug 1.4 (SVN branch)
 
-Version 0.3 will also work with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.1 + Firefox 3.0.4.
+  * Version 0.2 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
+
 
 # Contributors
 
-* **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
-* **[Ivan Fedorov][ivan]** - helping out with threading issues.
+  * **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
+  * **[Ivan Fedorov][ivan]** - helping out with threading issues.
 
 ### Also thanks to
 
-* **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
-* **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
-* **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
+  * **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
+  * **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
+  * **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
 
 # Support
 
