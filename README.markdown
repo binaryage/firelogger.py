@@ -12,24 +12,20 @@ You definitely need [Firebug 1.2 or higher][firebug].
 
 ## Installation
 
-### Version 0.2
+### Version 0.2 (outdated)
 
 Version 0.2 is quite outdated (November 2008). 
 I haven't made time to do proper release of 0.3 yet. 
 Are you adventurous? Skip this and check installation of latest version from sources in next section.
 
 #### Firefox Addon
-Preferred way is to install this firefox extension via addons.mozilla.com.
-The latest version is [available here][firepython].
-
-Warning: some people have reported they are unable to download and install extension from addons.mozilla.com. 
-In this case you may [try workaround][workaround].
+Preferred way is to [install this firefox extension][firepython] via addons.mozilla.com.
 
 #### Python Library
 
 ``sudo easy_install firepython``
 
-### Latest version from sources
+### Latest version from sources (preferred)
 
 #### Firefox Addon
 
@@ -63,9 +59,9 @@ Or if your web project uses git for versioning, you may want to be cool and use 
   
 ``git submodule add git://github.com/darwin/firepython.git relative/path/to/firepython``
 
-Note: you may want to replace last parameter with relative path in your repo.
+Note: replace last parameter with relative path in your repo.
 
-If firepython directory is not on your import paths, you need to add ``firepython`` folder into your ``sys.path``.
+In case firepython directory is not on your import paths, you need to add ``relative/path/to`` folder into your ``sys.path``.
 
 ## Usage
 
@@ -84,15 +80,12 @@ Look for inspiration in [middleware.py][middleware-source]
 ## Real world examples
 
   * [FirePython added to Bloog][bloog-example] (blog engine for GAE)
-  
   * [FirePython added to DryDrop][drydrop-example] (GAE hosting engine for GitHubbers && !Pythonists)
 
 # Current State
 
-  * Version 0.3 works with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.1 + Firefox 3.0.4. Btw. I'm running it with Firefox 3.2 (Nightly) + Firebug 1.4 (SVN branch)
-
-  * Version 0.2 is tested to work with alpha Firebug 1.3 and Firefox 3.1.
-
+  * **Version 0.3** works with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.1 + Firefox 3.0.4. Btw. I'm running it with Firefox 3.2 (Nightly) + Firebug 1.4 (SVN branch)
+  * **Version 0.2** is tested to work with alpha Firebug 1.3 and Firefox 3.1.
 
 # Contributors
 
@@ -107,10 +100,19 @@ Look for inspiration in [middleware.py][middleware-source]
 
 # Support
 
-### Bugs / Feature requests
+## FAQ
+
+### Clicking on source-file links in FirePython panel does nothing. How can I open trace-back sources in TextMate?
+> Go to Firebug Menu -> Open With Editor -> Configure editors ... like this: ![TextMate hint][textmate-hint]
+
+### I was unable to download/install FirePython extension from addons.mozilla.org. Can you package latest version for me?
+> Some people reported this problem too. You may [try workaround][workaround].
+
+
+## Bugs / Feature requests
 [The support forum is here][support].
 
-### IRC
+## IRC
 IRC channel [#firepython][irc] at freenode
 
 # Articles
@@ -141,7 +143,7 @@ IRC channel [#firepython][irc] at freenode
   * log record searching
   * opening files in TextMate (click to timestamp field)
 
-[screenshot]: http://github.com/darwin/firepython-addon/tree/master/support/screenshot.png?raw=true "FirePython in action"
+[screenshot]: http://cloud.github.com/downloads/darwin/firepython/FirePython-Screenshot-v0.3.png "FirePython in action"
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
 [firepython]: https://addons.mozilla.org/en-US/firefox/addon/9602
@@ -160,3 +162,4 @@ IRC channel [#firepython][irc] at freenode
 [jsonpickle]:http://code.google.com/p/jsonpickle/
 [bloog-example]:http://github.com/DocSavage/bloog/commit/346e5fb7c1fd87259dc79f2c4ae852badb6f2b79
 [drydrop-example]:http://github.com/darwin/drydrop/tree/22aadc0a463ae76e10aaefdf7aee002c7e605793/dryapp/drydrop_handler.py#L326
+[textmate-hint]:http://cloud.github.com/downloads/darwin/firepython/TextMateWithFirePython.png
