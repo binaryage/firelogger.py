@@ -3,7 +3,6 @@
 
 import base64
 import logging
-import re
 import sys
 import time
 import traceback
@@ -25,11 +24,6 @@ jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
 import firepython.utils
 
 class FirePythonBase(object):
-    FIREPYTHON_UA = re.compile(r'\sX-FirePython/(?P<ver>[0-9\.]+)', re.IGNORECASE)
-    FIREPYTHON_HEADER = re.compile(r'^FirePython', re.IGNORECASE)
-    DEEP_LOCALS = True
-    RAZOR_MODE = False
-    JSONPICKLE_DEPTH = 8
 
     def __init__(self):
         raise NotImplementedError("Must be subclassed")
@@ -46,19 +40,28 @@ class FirePythonBase(object):
         logger.removeHandler(self._handler)
         self._handler = None
 
-    def _ua_check(self, user_agent):
-        check = self.FIREPYTHON_UA.search(user_agent)
-        if not check:
-            return False
-        version = check.group('ver')
+    def _version_check(self, version_header):
+        version = version_header.strip()
+        if version == '': # see http://github.com/darwin/firelogger/commit/aaeb68c4034f066e88d206b47b6e0649beadee77
+            version = '0.2' 
         if firepython.__version__ != version:
-            logging.warning('FireBug part of FirePython is version %s, but Python part is %s', version, firepython.__version__)
+            logging.warning('FireLogger has version %s, but FirePython part is %s', version, firepython.__version__)
         return True
 
     def _password_check(self, token):
         if self._password is None:
             raise Exception("self._password must be set!")
-        return firepython.utils.get_auth_token(self._password) == token
+        if not firepython.utils.get_auth_token(self._password) == token:
+            logging.warning('FireLogger password does not match. Logging output won\'t be sent to FireLogger. Double check your settings!')
+            return False
+        return True
+        
+    def _check(self, env):
+        if self._check_agent and not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, '')):
+            return False
+        if (self._password and not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, ''))):
+            return False
+        return True
     
     def _sanitize_exc_info(self, exc_info):
         if exc_info==None:
@@ -71,7 +74,7 @@ class FirePythonBase(object):
         return (exc_type, exc_value, exc_traceback)
     
     def _handle_internal_exception(self, e):
-        if self.RAZOR_MODE: # in razor mode hurt web server
+        if firepython.RAZOR_MODE: # in razor mode hurt web server
             raise e
         # in non-razor mode report internal error to firepython addon
         exc_info = self._sanitize_exc_info(sys.exc_info())
@@ -83,26 +86,26 @@ class FirePythonBase(object):
         else:
             data = {"logs": logs }
         try:
-            data = jsonpickle.encode(data, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
+            data = jsonpickle.encode(data, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
         except Exception, e:
             # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
             errors = [self._handle_internal_exception(e)]
             try:
-                data = jsonpickle.encode({"errors": errors }, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
+                data = jsonpickle.encode({"errors": errors }, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
             except Exception, e:
                 # even unable to serialize error message
-                data = jsonpickle.encode({"errors": { "message": "FirePython has a really bad day :-(" } }, unpicklable=False, max_depth=self.JSONPICKLE_DEPTH)
+                data = jsonpickle.encode({"errors": { "message": "FirePython has a really bad day :-(" } }, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
     
     def republish(self, headers):
-        firepython_headers = []
+        firelogger_headers = []
         for key, value in headers.iteritems():
-            if self.FIREPYTHON_HEADER.match(key):
-                firepython_headers.append((key, value))
+            if firepython.FIRELOGGER_RESPONSE_HEADER.match(key):
+                firelogger_headers.append((key, value))
         
-        self._handler.republish(firepython_headers)
+        self._handler.republish(firelogger_headers)
 
     def _flush_records(self, add_header):
         """
@@ -132,7 +135,7 @@ class FirePythonBase(object):
         chunks = self._encode(logs, errors)
         guid = "%08x" % random.randint(0,0xFFFFFFFF)
         for i, chunk in enumerate(chunks):
-            add_header('FirePython-%s-%d' % (guid, i), chunk)
+            add_header('FireLogger-%s-%d' % (guid, i), chunk)
 
     def _prepare_log_record(self, record):
         data = {
@@ -161,7 +164,7 @@ class FirePythonBase(object):
                     try:
                         d = {}
                         for k,v in t.tb_frame.f_locals.iteritems():
-                            if self.DEEP_LOCALS:
+                            if firepython.DEEP_LOCALS:
                                 d[unicode(k)] = v
                             else:
                                 d[unicode(k)] = repr(v)
@@ -217,20 +220,13 @@ class FirePythonDjango(FirePythonBase):
         self.uninstall_handler()
 
     def process_request(self, request):
-        if self._check_agent and not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
-            return
-
-        if (self._password and
-            not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
+        if not self._check(request.META):
             return
 
         self._start()
 
     def process_response(self, request, response):
-        if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
-            return response
-        if (self._password and
-            not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
+        if not self._check(request.META):
             return response
 
         self._finish()
@@ -238,10 +234,7 @@ class FirePythonDjango(FirePythonBase):
         return response
 
     def process_exception(self, request, exception):
-        if not self._ua_check(request.META.get('HTTP_USER_AGENT', '')):
-            return
-        if (self._password and
-            not self._password_check(request.META.get('HTTP_X_FIREPYTHONAUTH', ''))):
+        if not self._check(request.META):
             return
 
         logging.exception(exception)
@@ -265,10 +258,7 @@ class FirePythonWSGI(FirePythonBase):
         self.uninstall_handler()
 
     def __call__(self, environ, start_response):
-        if self._check_agent and not self._ua_check(environ.get('HTTP_USER_AGENT', '')):
-            return self._app(environ, start_response)
-        
-        if self._password and not self._password_check(environ.get('HTTP_X_FIREPYTHONAUTH', '')):
+        if not self._check(environ):
             return self._app(environ, start_response)
 
         closure = ["200 OK", [], None] # ask why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
