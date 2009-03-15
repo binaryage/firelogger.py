@@ -1,6 +1,6 @@
 # FirePython
 
-FirePython is a sexy Python logger console integrated into [Firebug][firebug]. 
+FirePython is a sexy Python logger console integrated into [Firebug][firebug].
 
 Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].
 
@@ -8,7 +8,7 @@ Originally, I have created it to light up my lonely nights I was spending with [
 
 ## Prerequisites
 
-You definitely need [Firebug 1.2 or higher][firebug].
+You definitely need [Firebug 1.2 or higher][firebug]. You also have to install Firefox Addon which is called [FireLogger][firelogger].
 
 ## Installation
 
@@ -19,7 +19,7 @@ I haven't made time to do proper release of 0.3 yet.
 Are you adventurous? Skip this and check installation of latest version from sources in next section.
 
 #### Firefox Addon
-Preferred way is to [install this firefox extension][firepython] via addons.mozilla.com.
+Preferred way is to [install this firefox extension][firelogger] via addons.mozilla.com.
 
 #### Python Library
 
@@ -38,14 +38,14 @@ It should be simple, but make sure you have these tools on your paths:
 
 ##### Build steps:
 
-    git clone git://github.com/darwin/firepython-addon.git
+    git clone git://github.com/darwin/firelogger.git
     git clone git://github.com/darwin/firepython.git
     cd firepython
     rake
   
-After that your XPI should be available in ``build/firepython-X.Y.xpi``.
+After that your XPI should be available in ``build/firelogger-X.Y.xpi``.
 
-You should be able to install XPI file into Firefox: ``File -> Open File`` ... and browse for ``firepython-X.Y.xpi``.
+You should be able to install XPI file into Firefox: ``File -> Open File`` ... and browse for ``firelogger-X.Y.xpi``.
 
 Remember, that you should be also using latest FirePython library on server-side (see next section).
 
@@ -102,18 +102,17 @@ Look for inspiration in [middleware.py][middleware-source]
 
 ## FAQ
 
-### Clicking on source-file links in FirePython panel does nothing. How can I open trace-back sources in TextMate?
+### Clicking on source-file links in Logger panel does nothing. How can I open trace-back sources in TextMate?
 > Go to Firebug Menu -> Open With Editor -> Configure editors ... like this: ![TextMate hint][textmate-hint]
 
-### I was unable to download/install FirePython extension from addons.mozilla.org. Can you package latest version for me?
+### I was unable to download/install FireLogger extension from addons.mozilla.org. Can you package latest version for me?
 > Some people reported this problem too. You may [try workaround][workaround].
-
 
 ## Bugs / Feature requests
 [The support forum is here][support].
 
 ## IRC
-IRC channel [#firepython][irc] at freenode
+IRC channel [#firelogger][irc] at freenode
 
 # Articles
 
@@ -128,11 +127,12 @@ IRC channel [#firepython][irc] at freenode
   * console supports rich formatting of python log messages
   * thread-safety
   * improved API
+  * Firefox Addon detached as a separate project FireLogger
 
 * v0.2 (24.11.2008)
   * Django and WSGI middlewares by Alexander Solovyov
   * added as firepython package to PyPI index
-  * fixed FirePython panel styles when Firebug window was detached from main window
+  * fixed Logger panel styles when Firebug window was detached from main window
 
 * v0.1 (15.11.2008) 
   * public alpha release
@@ -146,17 +146,17 @@ IRC channel [#firepython][irc] at freenode
 [screenshot]: http://cloud.github.com/downloads/darwin/firepython/FirePython-Screenshot-v0.3.png "FirePython in action"
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
-[firepython]: https://addons.mozilla.org/en-US/firefox/addon/9602
+[firelogger]: https://addons.mozilla.org/en-US/firefox/addon/9602
 [homepage]: http://github.com/darwin/firepython
 [contact]: mailto:antonin@hildebrand.cz
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
-[support]: http://firepython.uservoice.com/
+[support]: http://firelogger.uservoice.com/
 [firepython-no-prints]:http://blogg.ingspree.net/blog/2008/11/24/firepython-no-prints/
 [alexander]:http://github.com/piranha
 [ivan]:http://github.com/oxyum
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
-[irc]:irc://irc.freenode.net/#firepython
+[irc]:irc://irc.freenode.net/#firelogger
 [addon-homepage]: http://github.com/darwin/firepython-addon
 [middleware-source]:http://github.com/darwin/firepython/tree/master/middleware.py
 [jsonpickle]:http://code.google.com/p/jsonpickle/
