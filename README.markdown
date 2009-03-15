@@ -138,7 +138,7 @@ IRC channel [#firelogger][irc] at freenode
 
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
-[firelogger]: https://addons.mozilla.org/en-US/firefox/addon/9602
+[firelogger]: https://addons.mozilla.org/en-US/firefox/addon/11090
 [homepage]: http://github.com/darwin/firepython
 [contact]: mailto:antonin@hildebrand.cz
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
