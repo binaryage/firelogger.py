@@ -5,4 +5,4 @@
 # for usage see README.markdown or http://github.com/woid/firepython
 #
 
-__version__ = '0.2'
+__version__ = '0.3'

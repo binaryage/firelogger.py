@@ -170,9 +170,8 @@ end
 
 desc "Resets version in all relevant sources"
 task :version do
-  check_if_addon_exists()
   version = ARGV[1] or die("Please specify a version as first parameter")
-  init_py_path = File.join(PYTHON, 'firepython', '__init__.py')
+  init_py_path = File.join(PYTHON, '__init__.py')
   if not patch(init_py_path, /__version__ = '([0-9\.])+'/, "__version__ = '#{version}'")
     puts "  #{red("patching had no effect")}"
   end
