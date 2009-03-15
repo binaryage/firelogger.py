@@ -29,8 +29,8 @@ Use jsonpickle to transform the object into a JSON string.
 Use jsonpickle to recreate a Python object from a JSON string
     
     >>> unpickled = jsonpickle.decode(pickled)
-    >>> unpickled.name
-    u'A String'
+    >>> str(unpickled.name)
+    'A String'
 
 .. warning::
 
@@ -60,7 +60,7 @@ added to JSON.
 
 
 
-__version__ = '0.2.0a'
+__version__ = '0.2.0'
 __all__ = ('encode', 'decode')
 
 
@@ -628,7 +628,10 @@ class Pickler(object):
             if is_function(v):
                 continue
             if type(k) not in types.StringTypes:
-                k = repr(k)
+                try:
+                    k = repr(k)
+                except:
+                    k = unicode(k)
             self._namestack.append(k)
             data[k] = self.flatten(v)
             self._namestack.pop()
