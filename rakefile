@@ -17,7 +17,7 @@
 #10. >rake
 
 ROOT = File.expand_path('.')
-ADDON = File.expand_path(File.join(ROOT, '..', 'firepython-addon')) # firepython-addon is expected to be at same directory level as firepython project
+ADDON = File.expand_path(File.join(ROOT, '..', 'firelogger')) # firelogger is expected to be at same directory level as firepython project
 FIREFOX = File.join(ADDON, 'firefox')
 DST = File.join(ROOT, 'build')
 TMP = File.join(ROOT, 'tmp')
@@ -138,29 +138,9 @@ end
 desc "Prepare XPI"
 task :default do
   check_if_addon_exists()
-  version = parse_version()
-
-  remove_dir(TMP) if File.exists?(TMP) # recursive!
-  mkdir(TMP, {:verbose => false})
-  cp_dir(File.join(FIREFOX, 'chrome'), File.join(TMP, "chrome"))
-  cp_dir(File.join(FIREFOX, 'defaults'), File.join(TMP, "defaults"))
-  dep(File.join(FIREFOX, 'chrome.manifest'))
-  dep(File.join(FIREFOX, 'install.rdf'))
-  dep(File.join(FIREFOX, 'license.txt'))
-  my_mkdir(DST) unless File.exist?(DST)
-  
-  firepython_js_path = File.join(TMP, "chrome", "content", "firepython.js")
-  patch(firepython_js_path, /(dbg\(.*\);)/, "/*\\1*/")
-
-  res = "#{DST}/firepython-#{version}.xpi"
-  File.unlink(res) if File.exists?(res)
-  puts "#{cmd_color('zipping')} #{file_color(res)}"
-  Dir.chdir(TMP) do
-    puts red('need zip on command line (download http://www.info-zip.org/Zip.html)') unless system("zip -r \"#{res}\" *");
+  Dir.chdir(ADDON) do
+    system('rake')
   end
-  remove_dir(TMP) if File.exist?(TMP) # recursive!
-  
-  puts "\ninstaller is in #{yellow(res)}, enjoy!"
 end
 
 desc "Update PyPI index and upload library sources"

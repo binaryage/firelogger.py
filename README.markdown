@@ -39,8 +39,7 @@ It should be simple, but make sure you have these tools on your paths:
 ##### Build steps:
 
     git clone git://github.com/darwin/firelogger.git
-    git clone git://github.com/darwin/firepython.git
-    cd firepython
+    cd firelogger
     rake
   
 After that your XPI should be available in ``build/firelogger-X.Y.xpi``.
