@@ -4,30 +4,24 @@ FirePython is a sexy Python logger console integrated into [Firebug][firebug].
 
 Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].
 
-![screenshot][screenshot]
+<a href="http://cloud.github.com/downloads/darwin/firelogger/FireLogger-Screenshot-v0.3.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLogger-Screenshot-v0.3.png" width="900"/></a>
 
 ## Prerequisites
 
 You definitely need [Firebug 1.2 or higher][firebug]. You also have to install Firefox Addon which is called [FireLogger][firelogger].
 
-## Installation
+## Easy Installation
 
-### Version 0.2 (outdated)
-
-Version 0.2 is quite outdated (November 2008). 
-I haven't made time to do proper release of 0.3 yet. 
-Are you adventurous? Skip this and check installation of latest version from sources in next section.
-
-#### Firefox Addon
+### Firefox Addon
 Preferred way is to [install this firefox extension][firelogger] via addons.mozilla.com.
 
-#### Python Library
+### Python Library
 
 ``sudo easy_install firepython``
 
-### Latest version from sources (preferred)
+## Install latest version from sources (preferred)
 
-#### Firefox Addon
+### Firefox Addon
 
 If you want to install latest addon from sources, you need to build it. 
 It should be simple, but make sure you have these tools on your paths:
@@ -36,7 +30,7 @@ It should be simple, but make sure you have these tools on your paths:
 * zip
 * ruby and rake
 
-##### Build steps:
+#### Build steps:
 
     git clone git://github.com/darwin/firelogger.git
     cd firelogger
@@ -48,7 +42,7 @@ You should be able to install XPI file into Firefox: ``File -> Open File`` ... a
 
 Remember, that you should be also using latest FirePython library on server-side (see next section).
 
-#### Python Library
+### Python Library
 
 Just note, that it depends on simplejson (or some other json parsing library needed by [jsonpickle][jsonpickle]).
 
@@ -119,7 +113,7 @@ IRC channel [#firelogger][irc] at freenode
 
 # History
 
-* v0.3 (to be released)
+* v0.3 (16.03.2009)
   * compatibility with Firebug 1.2
   * password protection for production site
   * path rewrite functionality
@@ -142,7 +136,6 @@ IRC channel [#firelogger][irc] at freenode
   * log record searching
   * opening files in TextMate (click to timestamp field)
 
-[screenshot]: http://cloud.github.com/downloads/darwin/firepython/FirePython-Screenshot-v0.3.png "FirePython in action"
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
 [firelogger]: https://addons.mozilla.org/en-US/firefox/addon/9602
