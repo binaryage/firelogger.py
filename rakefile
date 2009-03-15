@@ -155,7 +155,6 @@ task :pypi do
   firepython_dir = File.join(TMP, 'firepython')
   my_mkdir(firepython_dir) unless File.exist?(firepython_dir)
   dep2(File.join(ROOT, '__init__.py'), 'firepython')
-  dep2(File.join(ROOT, 'gaesupport.py'), 'firepython')
   dep2(File.join(ROOT, 'middleware.py'), 'firepython')
   dep2(File.join(ROOT, 'utils.py'), 'firepython')
   dep2(File.join(ROOT, 'handlers.py'), 'firepython')
