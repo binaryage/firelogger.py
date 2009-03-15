@@ -30,7 +30,7 @@ It should be simple, but make sure you have these tools on your paths:
 * zip
 * ruby and rake
 
-#### Build steps:
+Build steps:
 
     git clone git://github.com/darwin/firelogger.git
     cd firelogger
@@ -77,7 +77,10 @@ Look for inspiration in [middleware.py][middleware-source]
 
 # Current State
 
-  * **Version 0.3** works with final Firebug 1.3 + Firefox 3.1 and Firebug 1.2.1 + Firefox 3.0.4. Btw. I'm running it with Firefox 3.2 (Nightly) + Firebug 1.4 (SVN branch)
+  * **Version 0.3** works with:
+    * Firebug 1.3 + Firefox 3.1 
+    * Firebug 1.2.1 + Firefox 3.0.4. 
+    * I'm running it with Firebug 1.4 (SVN branch) + Firefox 3.2 (Nightly)
   * **Version 0.2** is tested to work with alpha Firebug 1.3 and Firefox 3.1.
 
 # Contributors
@@ -113,6 +116,8 @@ IRC channel [#firelogger][irc] at freenode
 
 # History
 
+* v0.4 (to be released)
+
 * v0.3 (16.03.2009)
   * compatibility with Firebug 1.2
   * password protection for production site
@@ -121,6 +126,7 @@ IRC channel [#firelogger][irc] at freenode
   * thread-safety
   * improved API
   * Firefox Addon detached as a separate project FireLogger
+  * option for hiding internal reprs of exported objects
 
 * v0.2 (24.11.2008)
   * Django and WSGI middlewares by Alexander Solovyov
