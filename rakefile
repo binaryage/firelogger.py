@@ -148,7 +148,7 @@ task :pypi do
   remove_dir(TMP) if File.exists?(TMP) # recursive!
   mkdir(TMP, {:verbose => false})
 
-  dep2(File.join(ROOT, 'README.markdown'))
+  dep2(File.join(ROOT, 'readme.md'))
   dep2(File.join(ROOT, 'license.txt'))
   dep2(File.join(ROOT, 'setup.py'))
 

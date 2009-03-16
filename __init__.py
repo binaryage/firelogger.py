@@ -1,8 +1,8 @@
 # -*- mode: python; coding: utf-8 -*-
 #
-# FirePython server-side support library
+# FireLogger server-side support library for Python
 #
-# for usage see README.markdown or http://github.com/woid/firepython
+# for usage see readme.md or http://github.com/darwin/firepython
 #
 
 import re
