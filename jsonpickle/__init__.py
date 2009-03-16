@@ -416,6 +416,7 @@ def is_repr(obj):
         * :class:`~datetime.time`
         * :class:`~datetime.timedelta`
     """
+    if type(obj) is types.ModuleType: return True
     return isinstance(obj, NEEDS_REPR)
 
 def is_function(obj):
