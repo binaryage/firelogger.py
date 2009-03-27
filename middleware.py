@@ -204,20 +204,18 @@ class FirePythonBase(object):
       """
       if not self._profile_enabled:
         return self._app
+      try:
+        import cProfile as profile
+      except ImportError:
+        import profile
       self._prof = profile.Profile()
       def prof_wrapper(environ, start_response):
-        def app_wrapper():
-          return self._app(environ, start_response)
-        return self._prof.runcall(app_wrapper)
+        return self._prof.runcall(self._app, environ, start_response)
       return prof_wrapper
 
     def _output_profile(self, add_header):
       """Outputs profiling information to a header."""
       if self._profile_enabled:
-        try:
-          import cProfile as profile
-        except ImportError:
-          import profile
         try:
           import gprof2dot
         except ImportError:
@@ -227,12 +225,18 @@ class FirePythonBase(object):
         self._prof.create_stats()
         parser = gprof2dot.PstatsParser(self._prof)
         output = StringIO()
-        profile = parser.parse()
+        gprof = parser.parse()
         # TODO: Parameterize node and edge thresholds.
-        profile.prune(0.005, 0.001)
+        gprof.prune(0.005, 0.001)
         dot = gprof2dot.DotWriter(output)
-        dot.graph(profile, gprof2dot.BW_COLORMAP)
-        add_header("FireLoggerProfile", base64.b64encode(output.getvalue()))
+        dot.graph(gprof, gprof2dot.BW_COLORMAP)
+
+        # Browsers freak out with headers that are > 1KB
+        encoded = base64.b64encode(output.getvalue())
+        guid = "%08x" % random.randint(0,0xFFFFFFFF)
+        for i, cut in enumerate(xrange(0, len(encoded), 1000)):
+          add_header("FireLogger-%s-%d-profile" % (guid, i),
+                     encoded[cut:cut+1000])
 
 
 class FirePythonDjango(FirePythonBase):
