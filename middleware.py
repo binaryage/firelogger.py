@@ -55,8 +55,9 @@ class FirePythonBase(object):
             logging.warning('FireLogger password does not match. Logging output won\'t be sent to FireLogger. Double check your settings!')
             return False
         return True
-        
+
     def _check(self, env):
+        self._profile_enabled = bool(env.get(firepython.FIRELOGGER_PROFILER_ENABLED, ''))
         if self._check_agent and not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, '')):
             return False
         if (self._password and not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, ''))):
@@ -195,6 +196,44 @@ class FirePythonBase(object):
     def _finish(self):
         self._handler.finish()
 
+    def _get_app(self):
+      """Returns the WSGI app to run.
+
+      If the FIRELOGGER_PROFILER_ENABLED header has been passed to this WSGI
+      request, the returned application will be wrapped with a profiler.
+      """
+      if not self._profile_enabled:
+        return self._app
+      self._prof = profile.Profile()
+      def prof_wrapper(environ, start_response):
+        def app_wrapper():
+          return self._app(environ, start_response)
+        return self._prof.runcall(app_wrapper)
+      return prof_wrapper
+
+    def _output_profile(self, add_header):
+      """Outputs profiling information to a header."""
+      if self._profile_enabled:
+        try:
+          import cProfile as profile
+        except ImportError:
+          import profile
+        try:
+          import gprof2dot
+        except ImportError:
+          logging.error('Unable to profile request: Could not find gprof2dot module')
+          return
+
+        self._prof.create_stats()
+        parser = gprof2dot.PstatsParser(self._prof)
+        output = StringIO()
+        profile = parser.parse()
+        # TODO: Parameterize node and edge thresholds.
+        profile.prune(0.005, 0.001)
+        dot = gprof2dot.DotWriter(output)
+        dot.graph(profile, gprof2dot.BW_COLORMAP)
+        add_header("FireLoggerProfile", base64.b64encode(output.getvalue()))
+
 
 class FirePythonDjango(FirePythonBase):
     """
@@ -275,7 +314,8 @@ class FirePythonWSGI(FirePythonBase):
         self._start()
         # run app
         try:
-            app_iter = self._app(environ, faked_start_response)
+            app = self._get_app()
+            app_iter = app(environ, faked_start_response)
             output = list(app_iter)
         except Exception:
             logging.exception(sys.exc_info()[1])
@@ -285,6 +325,8 @@ class FirePythonWSGI(FirePythonBase):
             logging.exception(sys.exc_info()[0])
             raise
         finally:
+            # Output the profile first, so we can see any errors in profiling.
+            self._output_profile(add_header)
             self._finish()
             self._flush_records(add_header)
 
