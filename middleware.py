@@ -2,11 +2,12 @@
 #
 
 import base64
+import copy
 import logging
+import os
 import sys
 import time
 import traceback
-import copy
 import random
 
 try:
@@ -57,7 +58,7 @@ class FirePythonBase(object):
         return True
 
     def _check(self, env):
-        self._profile_enabled = bool(env.get(firepython.FIRELOGGER_PROFILER_ENABLED, ''))
+        self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED, '') != ''
         if self._check_agent and not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, '')):
             return False
         if (self._password and not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, ''))):
@@ -203,38 +204,47 @@ class FirePythonBase(object):
       request, the returned application will be wrapped with a profiler.
       """
       if not self._profile_enabled:
-        return self._app
+          return self._app
       try:
-        import cProfile as profile
+          import cProfile as profile
       except ImportError:
-        import profile
+          import profile
       self._prof = profile.Profile()
       def prof_wrapper(environ, start_response):
-        return self._prof.runcall(self._app, environ, start_response)
+          return self._prof.runcall(self._app, environ, start_response)
       return prof_wrapper
 
     def _output_profile(self, add_header):
       """Outputs profiling information to a header."""
-      if self._profile_enabled:
-        try:
-          import gprof2dot
-        except ImportError:
-          logging.error('Unable to profile request: Could not find gprof2dot module')
+      if not self._profile_enabled:
           return
 
-        self._prof.create_stats()
-        parser = gprof2dot.PstatsParser(self._prof)
-        output = StringIO()
-        gprof = parser.parse()
-        # TODO: Parameterize node and edge thresholds.
-        gprof.prune(0.005, 0.001)
-        dot = gprof2dot.DotWriter(output)
-        dot.graph(gprof, gprof2dot.BW_COLORMAP)
+      try:
+        import gprof2dot
+      except ImportError:
+        logging.error('Unable to profile request: Could not find gprof2dot module')
+        return
 
-        # Browsers freak out with headers that are > 1KB
-        encoded = base64.b64encode(output.getvalue())
-        guid = "%08x" % random.randint(0,0xFFFFFFFF)
-        for i, cut in enumerate(xrange(0, len(encoded), 1000)):
+      self._prof.create_stats()
+      parser = gprof2dot.PstatsParser(self._prof)
+      def get_function_name((filename, line, name)):
+          module = os.path.splitext(filename)[0]
+          module_pieces = module.split(os.path.sep)
+          return "%s:%d:%s" % ("/".join(module_pieces[-4:]), line, name)
+      parser.get_function_name = get_function_name
+      output = StringIO()
+      gprof = parser.parse()
+
+      gprof.prune(0.005, 0.001)  # TODO: Parameterize node and edge thresholds.
+      dot = gprof2dot.DotWriter(output)
+      theme = gprof2dot.TEMPERATURE_COLORMAP
+      theme.bgcolor = (0.0, 0.0, 0.0)  # Use black text, for less eye-bleeding.
+      dot.graph(gprof, theme)
+
+      # Browsers freak out with headers that are > 1KB
+      encoded = base64.b64encode(output.getvalue())
+      guid = "%08x" % random.randint(0,0xFFFFFFFF)
+      for i, cut in enumerate(xrange(0, len(encoded), 1000)):
           add_header("FireLogger-%s-%d-profile" % (guid, i),
                      encoded[cut:cut+1000])
 
