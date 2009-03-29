@@ -77,16 +77,22 @@ Look for inspiration in [middleware.py][middleware-source]
 
 # Current State
 
+Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of changes around [Simplified Activation][activation] and API changes. Expect FireLogger 0.5 to no longer work with Firebug 1.3 and lower.
+
+  * **Version 0.4** works with:
+    * Firebug 1.3 + Firefox 3.1 
+    * Firebug 1.2.1 + Firefox 3.0.4. 
+    * does not work with Firebug 1.4 alpha!
   * **Version 0.3** works with:
     * Firebug 1.3 + Firefox 3.1 
     * Firebug 1.2.1 + Firefox 3.0.4. 
-    * I'm running it with Firebug 1.4 (SVN branch) + Firefox 3.2 (Nightly)
   * **Version 0.2** is tested to work with alpha Firebug 1.3 and Firefox 3.1.
 
 # Contributors
 
   * **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
   * **[Ivan Fedorov][ivan]** - helping out with threading issues.
+  * **[Brett Slatkin][brett]** - added profiling feature.
 
 ### Also thanks to
 
@@ -98,11 +104,19 @@ Look for inspiration in [middleware.py][middleware-source]
 
 ## FAQ
 
+### How can I open preferences?
+> Switch to Logger panel and look to Firebug's toolbar. There is a green bug icon. It is a menu button!
+
 ### Clicking on source-file links in Logger panel does nothing. How can I open trace-back sources in TextMate?
 > Go to Firebug Menu -> Open With Editor -> Configure editors ... like this: ![TextMate hint][textmate-hint]
 
 ### I was unable to download/install FireLogger extension from addons.mozilla.org. Can you package latest version for me?
 > Some people reported this problem too. You may [try workaround][workaround].
+
+### How can I see Python profiling graph?
+> 1. enable this feature in FireLogger preferences
+> 2. setup "Graphviz" editor in External Editors in Firebug (the name is important!). It should be path to a viewer for .dot graphs, filename will be passed as the first parameter
+> 3. reload page and you should see info log line containing profiling info, clicking on timestamp field opens Graphviz editor
 
 ## Bugs / Feature requests
 [The support forum is here][support].
@@ -117,30 +131,31 @@ IRC channel [#firelogger][irc] at freenode
 # History
 
 * v0.4 (to be released)
+  * [[bslatkin][brett]] profiling graphs for Python
 
 * v0.3 (16.03.2009)
-  * compatibility with Firebug 1.2
-  * password protection for production site
-  * path rewrite functionality
-  * console supports rich formatting of python log messages
-  * thread-safety
-  * improved API
-  * Firefox Addon detached as a separate project FireLogger
-  * option for hiding internal reprs of exported objects
+  * [[darwin][antonin]] compatibility with Firebug 1.2
+  * [[darwin][antonin]] password protection for production site
+  * [[darwin][antonin]] path rewrite functionality
+  * [[darwin][antonin]] console supports rich formatting of python log messages
+  * [[oxyum][ivan]+[piranha][alexander]] thread-safety
+  * [[darwin][antonin]] improved API
+  * [[darwin][antonin]] Firefox Addon detached as a separate project FireLogger
+  * [[darwin][antonin]] option for hiding internal reprs of exported objects
 
 * v0.2 (24.11.2008)
-  * Django and WSGI middlewares by Alexander Solovyov
-  * added as firepython package to PyPI index
-  * fixed Logger panel styles when Firebug window was detached from main window
+  * [[piranha][alexander]] Django and WSGI middlewares
+  * [[piranha][alexander]] added as firepython package to PyPI index
+  * [[darwin][antonin]] fixed Logger panel styles when Firebug window was detached from main window
 
 * v0.1 (15.11.2008) 
-  * public alpha release
-  * initial server-side support for Python and Google App Engine
-  * communication via response headers
-  * logging module functionality (debug, info, warning, error, critical)
-  * log record filtering by type
-  * log record searching
-  * opening files in TextMate (click to timestamp field)
+  * [[darwin][antonin]] public alpha release
+  * [[darwin][antonin]] initial server-side support for Python and Google App Engine
+  * [[darwin][antonin]] communication via response headers
+  * [[darwin][antonin]] logging module functionality (debug, info, warning, error, critical)
+  * [[darwin][antonin]] log record filtering by type
+  * [[darwin][antonin]] log record searching
+  * [[darwin][antonin]] opening files in TextMate (click to timestamp field)
 
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
@@ -152,6 +167,8 @@ IRC channel [#firelogger][irc] at freenode
 [firepython-no-prints]:http://blogg.ingspree.net/blog/2008/11/24/firepython-no-prints/
 [alexander]:http://github.com/piranha
 [ivan]:http://github.com/oxyum
+[brett]:http://github.com/bslatkin
+[antonin]:http://github.com/darwin
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
 [irc]:irc://irc.freenode.net/#firelogger
@@ -161,3 +178,4 @@ IRC channel [#firelogger][irc] at freenode
 [bloog-example]:http://github.com/DocSavage/bloog/commit/346e5fb7c1fd87259dc79f2c4ae852badb6f2b79
 [drydrop-example]:http://github.com/darwin/drydrop/tree/22aadc0a463ae76e10aaefdf7aee002c7e605793/dryapp/drydrop_handler.py#L326
 [textmate-hint]:http://cloud.github.com/downloads/darwin/firepython/TextMateWithFirePython.png
+[activation]:http://blog.getfirebug.com/?p=124
