@@ -241,12 +241,13 @@ class FirePythonBase(object):
       theme.bgcolor = (0.0, 0.0, 0.0)  # Use black text, for less eye-bleeding.
       dot.graph(gprof, theme)
 
-      # Browsers freak out with headers that are > 1KB
+      # Some application servers disallow headers over 100 bytes.
       encoded = base64.b64encode(output.getvalue())
       guid = "%08x" % random.randint(0,0xFFFFFFFF)
-      for i, cut in enumerate(xrange(0, len(encoded), 1000)):
+      cut_size = 255
+      for i, cut in enumerate(xrange(0, len(encoded), cut_size)):
           add_header("FireLogger-%s-%d-profile" % (guid, i),
-                     encoded[cut:cut+1000])
+                     encoded[cut:cut+cut_size])
 
 
 class FirePythonDjango(FirePythonBase):
