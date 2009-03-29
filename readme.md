@@ -91,7 +91,7 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 # Contributors
 
   * **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
-  * **[Ivan Fedorov][ivan]** - helping out with threading issues.
+  * **[Ivan Fedorov][ivan]** - helped out with threading issues.
   * **[Brett Slatkin][brett]** - added profiling feature.
 
 ### Also thanks to
@@ -99,6 +99,7 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
   * **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
   * **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
   * **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
+  * **[Jose Fonseca for gprof2dot library][gprof2dot]** - deep Python profiling possible
 
 # Support
 
@@ -115,8 +116,8 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 
 ### How can I see Python profiling graph?
 > 1. enable this feature in FireLogger preferences
-> 2. setup "Graphviz" editor in External Editors in Firebug (the name is important!). It should be path to a viewer for .dot graphs, filename will be passed as the first parameter
-> 3. reload page and you should see info log line containing profiling info, clicking on timestamp field opens Graphviz editor
+> 2. setup "Graphviz" editor in External Editors in Firebug (the name is important!). It should be path to a viewer for .dot graphs (filename will be passed as the first parameter)
+> 3. reload page and you should see info log line containing profiling info, clicking on timestamp field opens your Graphviz viewer
 
 ## Bugs / Feature requests
 [The support forum is here][support].
@@ -179,3 +180,4 @@ IRC channel [#firelogger][irc] at freenode
 [drydrop-example]:http://github.com/darwin/drydrop/tree/22aadc0a463ae76e10aaefdf7aee002c7e605793/dryapp/drydrop_handler.py#L326
 [textmate-hint]:http://cloud.github.com/downloads/darwin/firepython/TextMateWithFirePython.png
 [activation]:http://blog.getfirebug.com/?p=124
+[gprof2dot]:http://code.google.com/p/jrfonseca/wiki/Gprof2Dot
