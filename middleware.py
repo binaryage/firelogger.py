@@ -82,11 +82,12 @@ class FirePythonBase(object):
         exc_info = self._sanitize_exc_info(sys.exc_info())
         return {"message": "Internal FirePython error: %s" % unicode(e), "exc_info": exc_info}
 
-    def _encode(self, logs, errors):
+    def _encode(self, logs, errors = None, profile = None):
+        data = {"logs": logs }
         if errors:
-            data = {"logs": logs, "errors": errors}
-        else:
-            data = {"logs": logs }
+            data['errors'] = errors
+        if profile:
+            data['profile'] = profile
         try:
             data = jsonpickle.encode(data, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
         except Exception, e:
@@ -109,7 +110,7 @@ class FirePythonBase(object):
         
         self._handler.republish(firelogger_headers)
 
-    def _flush_records(self, add_header):
+    def _flush_records(self, add_header, profile = None):
         """
         Flush collected logs into response.
 
@@ -134,7 +135,7 @@ class FirePythonBase(object):
                 # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
                 errors.append(self._handle_internal_exception(e))
 
-        chunks = self._encode(logs, errors)
+        chunks = self._encode(logs, errors, profile)
         guid = "%08x" % random.randint(0,0xFFFFFFFF)
         for i, chunk in enumerate(chunks):
             add_header('FireLogger-%s-%d' % (guid, i), chunk)
@@ -214,16 +215,16 @@ class FirePythonBase(object):
           return self._prof.runcall(self._app, environ, start_response)
       return prof_wrapper
 
-    def _output_profile(self, add_header):
-      """Outputs profiling information to a header."""
+    def _prepare_profile(self):
+      """Prepares profiling information."""
       if not self._profile_enabled:
-          return
+          return None
 
       try:
         import gprof2dot
       except ImportError:
         logging.error('Unable to profile request: Could not find gprof2dot module')
-        return
+        return None
 
       self._prof.create_stats()
       parser = gprof2dot.PstatsParser(self._prof)
@@ -241,13 +242,22 @@ class FirePythonBase(object):
       theme.bgcolor = (0.0, 0.0, 0.0)  # Use black text, for less eye-bleeding.
       dot.graph(gprof, theme)
 
-      # Some application servers disallow headers over 100 bytes.
-      encoded = base64.b64encode(output.getvalue())
-      guid = "%08x" % random.randint(0,0xFFFFFFFF)
-      cut_size = 255
-      for i, cut in enumerate(xrange(0, len(encoded), cut_size)):
-          add_header("FireLogger-%s-%d-profile" % (guid, i),
-                     encoded[cut:cut+cut_size])
+      def get_info(self):
+          s = "Profile Graph:"
+          s += " %.3fs CPU" % self.total_tt
+          s += ": %d function calls" % self.total_calls
+          if self.total_calls != self.prim_calls:
+              s += " (%d primitive calls)" % self.prim_calls
+          return s
+      
+      profile = {
+        "producer": "gprof2dot",
+        "producerVersion": str(gprof2dot.__version__),
+        "info": get_info(parser.stats),
+        "dot": output.getvalue(),
+      }
+      
+      return profile
 
 
 class FirePythonDjango(FirePythonBase):
@@ -341,9 +351,9 @@ class FirePythonWSGI(FirePythonBase):
             raise
         finally:
             # Output the profile first, so we can see any errors in profiling.
-            self._output_profile(add_header)
+            profile = self._prepare_profile()
             self._finish()
-            self._flush_records(add_header)
+            self._flush_records(add_header, profile)
 
         # start responding
         write = start_response(*closure)
