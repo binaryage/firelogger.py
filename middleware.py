@@ -1,8 +1,6 @@
 # -*- mode: python; coding: utf-8 -*-
-#
 
 import base64
-import copy
 import logging
 import os
 import sys
@@ -16,13 +14,14 @@ except ImportError:
     from StringIO import StringIO
 
 import firepython
+import firepython.utils
 from firepython.handlers import ThreadBufferedHandler
 import jsonpickle
+
 # add a new backed jsonpickle for Django
 # jsonpickle will attempt to import this if default jsonpickle libraries are not present
 jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
 
-import firepython.utils
 
 class FirePythonBase(object):
 
@@ -44,7 +43,7 @@ class FirePythonBase(object):
     def _version_check(self, version_header):
         version = version_header.strip()
         if version == '': # see http://github.com/darwin/firelogger/commit/aaeb68c4034f066e88d206b47b6e0649beadee77
-            version = '0.2' 
+            version = '0.2'
         if firepython.__version__ != version:
             logging.warning('FireLogger has version %s, but FirePython part is %s', version, firepython.__version__)
         return True
@@ -64,7 +63,7 @@ class FirePythonBase(object):
         if (self._password and not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, ''))):
             return False
         return True
-    
+
     def _sanitize_exc_info(self, exc_info):
         if exc_info==None:
             return ("?", "No exception info available", [])
@@ -74,7 +73,7 @@ class FirePythonBase(object):
         if exc_traceback is not None:
             exc_traceback = traceback.extract_tb(exc_traceback)
         return (exc_type, exc_value, exc_traceback)
-    
+
     def _handle_internal_exception(self, e):
         if firepython.RAZOR_MODE: # in razor mode hurt web server
             raise e
@@ -101,13 +100,13 @@ class FirePythonBase(object):
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
-    
+
     def republish(self, headers):
         firelogger_headers = []
         for key, value in headers.iteritems():
             if firepython.FIRELOGGER_RESPONSE_HEADER.match(key):
                 firelogger_headers.append((key, value))
-        
+
         self._handler.republish(firelogger_headers)
 
     def _flush_records(self, add_header, profile = None):
@@ -122,16 +121,16 @@ class FirePythonBase(object):
         self._handler.clear_records()
         republished = self._handler.get_republished()
         self._handler.clear_republished()
-        
+
         for name, value in republished:
             add_header(name, value)
-        
+
         logs = []
         errors = []
         for record in records:
             try:
                 logs.append(self._prepare_log_record(record))
-            except Exception, e: 
+            except Exception, e:
                 # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
                 errors.append(self._handle_internal_exception(e))
 
@@ -160,7 +159,7 @@ class FirePythonBase(object):
             exc_info = getattr(record, 'exc_info')
             if exc_info is not None:
                 data['exc_info'] = self._sanitize_exc_info(exc_info)
-                
+
                 frames = []
                 t = exc_info[2]
                 while t:
@@ -249,14 +248,14 @@ class FirePythonBase(object):
           if self.total_calls != self.prim_calls:
               s += " (%d primitive calls)" % self.prim_calls
           return s
-      
+
       profile = {
         "producer": "gprof2dot",
         "producerVersion": str(gprof2dot.__version__),
         "info": get_info(parser.stats),
         "dot": output.getvalue(),
       }
-      
+
       return profile
 
 

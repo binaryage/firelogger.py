@@ -1,5 +1,5 @@
 # -*- mode: python; coding: utf-8 -*-
-#
+
 import firepython
 
 try:
@@ -21,9 +21,9 @@ def json_encode(data):
 
 def get_version_header(version = firepython.__version__):
     return (firepython.FIRELOGGER_VERSION_HEADER, version)
-    
+
 def get_auth_token(password):
     return md5('#FireLoggerPassword#%s#' % password).hexdigest()
-    
+
 def get_auth_header(password):
     return (firepython.FIRELOGGER_AUTH_HEADER, get_auth_token(password))
