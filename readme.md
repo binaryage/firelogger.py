@@ -108,6 +108,9 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 ### How can I open preferences?
 > Switch to Logger panel and look to Firebug's toolbar. There is a green bug icon. It is a menu button!
 
+<a href="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerMenuButton.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerMenuButton.png"></a><br/>
+<a href="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerPreferences.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerPreferences.png"></a>
+
 ### Clicking on source-file links in Logger panel does nothing. How can I open trace-back sources in TextMate?
 > Go to Firebug Menu -> Open With Editor -> Configure editors ... like this: ![TextMate hint][textmate-hint]
 
@@ -115,9 +118,14 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 > Some people reported this problem too. You may [try workaround][workaround].
 
 ### How can I see Python profiling graph?
+
 > 1. enable this feature in FireLogger preferences
-> 2. setup "Graphviz" editor in External Editors in Firebug (the name is important!). It should be path to a viewer for .dot graphs (filename will be passed as the first parameter)
-> 3. reload page and you should see info log line containing profiling info, clicking on timestamp field opens your Graphviz viewer
+> 2. setup a editor in External Editors in Firebug called "Graphviz" (the name is important!). It should be path to executable of a viewer for .dot graphs.
+> 3. reload page and you should see info log line containing profiling info, clicking on the line launches configured Graphviz viewer (a filename will be passed as the first parameter)
+
+<a href="http://cloud.github.com/downloads/darwin/firelogger/ExternalEditorsConfiguration.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/ExternalEditorsConfiguration.png"></a><br>
+<a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"></a><br>
+<a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png" width="600"></a>
 
 ## Bugs / Feature requests
 [The support forum is here][support].
@@ -131,8 +139,10 @@ IRC channel [#firelogger][irc] at freenode
 
 # History
 
-* v0.4 (to be released)
-  * [[bslatkin][brett]] profiling graphs for Python
+* v0.4 (30.03.2009)
+  * [[bslatkin][brett]] profiling graphs for Python (WSGI)
+  * [[piranha][alexander]] enabled profiling support for Django
+  * [[piranha][alexander]] PEP-8 code cleanup
 
 * v0.3 (16.03.2009)
   * [[darwin][antonin]] compatibility with Firebug 1.2
