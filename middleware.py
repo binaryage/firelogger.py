@@ -42,10 +42,12 @@ class FirePythonBase(object):
 
     def _version_check(self, version_header):
         version = version_header.strip()
-        if version == '': # see http://github.com/darwin/firelogger/commit/aaeb68c4034f066e88d206b47b6e0649beadee77
+        if version == '':
+            # see http://github.com/darwin/firelogger/commit/aaeb68c4034f066e88d206b47b6e0649beadee77
             version = '0.2'
         if firepython.__version__ != version:
-            logging.warning('FireLogger has version %s, but FirePython part is %s', version, firepython.__version__)
+            logging.warning('FireLogger has version %s, but FirePython part is %s',
+                            version, firepython.__version__)
         return True
 
     def _password_check(self, token):
@@ -58,9 +60,11 @@ class FirePythonBase(object):
 
     def _check(self, env):
         self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED, '') != ''
-        if self._check_agent and not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, '')):
+        if (self._check_agent and
+            not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
             return False
-        if (self._password and not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, ''))):
+        if ((self._password and
+             not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, '')))):
             return False
         return True
 
@@ -79,24 +83,30 @@ class FirePythonBase(object):
             raise e
         # in non-razor mode report internal error to firepython addon
         exc_info = self._sanitize_exc_info(sys.exc_info())
-        return {"message": "Internal FirePython error: %s" % unicode(e), "exc_info": exc_info}
+        return {"message": "Internal FirePython error: %s" % unicode(e),
+                "exc_info": exc_info}
 
-    def _encode(self, logs, errors = None, profile = None):
+    def _encode(self, logs, errors=None, profile=None):
         data = {"logs": logs }
         if errors:
             data['errors'] = errors
         if profile:
             data['profile'] = profile
         try:
-            data = jsonpickle.encode(data, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
+            data = jsonpickle.encode(data, unpicklable=False,
+                                     max_depth=firepython.JSONPICKLE_DEPTH)
         except Exception, e:
-            # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
+            # this exception may be fired, because of buggy __repr__ or
+            # __str__ implementations on various objects
             errors = [self._handle_internal_exception(e)]
             try:
-                data = jsonpickle.encode({"errors": errors }, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
+                data = jsonpickle.encode({"errors": errors }, unpicklable=False,
+                                         max_depth=firepython.JSONPICKLE_DEPTH)
             except Exception, e:
                 # even unable to serialize error message
-                data = jsonpickle.encode({"errors": { "message": "FirePython has a really bad day :-(" } }, unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
+                data = jsonpickle.encode(
+                    {"errors": { "message": "FirePython has a really bad day :-(" } },
+                    unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
         data = data.encode('utf-8')
         data = base64.encodestring(data)
         return data.splitlines()
@@ -109,7 +119,7 @@ class FirePythonBase(object):
 
         self._handler.republish(firelogger_headers)
 
-    def _flush_records(self, add_header, profile = None):
+    def _flush_records(self, add_header, profile=None):
         """
         Flush collected logs into response.
 
@@ -131,7 +141,8 @@ class FirePythonBase(object):
             try:
                 logs.append(self._prepare_log_record(record))
             except Exception, e:
-                # this exception may be fired, because of buggy __repr__ or __str__ implementations on various objects
+                # this exception may be fired, because of buggy __repr__ or
+                # __str__ implementations on various objects
                 errors.append(self._handle_internal_exception(e))
 
         chunks = self._encode(logs, errors, profile)
@@ -148,7 +159,8 @@ class FirePythonBase(object):
             "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
                      (".%03d" % ((record.created - long(record.created)) * 1000)))
         }
-        props = ["args", "pathname", "lineno", "exc_text", "name", "process", "thread", "threadName"]
+        props = ["args", "pathname", "lineno", "exc_text", "name", "process",
+                 "thread", "threadName"]
         for p in props:
             try:
                 data[p] = getattr(record, p)
@@ -198,65 +210,65 @@ class FirePythonBase(object):
         self._handler.finish()
 
     def _get_app(self):
-      """Returns the WSGI app to run.
+        """Returns the WSGI app to run.
 
-      If the FIRELOGGER_PROFILER_ENABLED header has been passed to this WSGI
-      request, the returned application will be wrapped with a profiler.
-      """
-      if not self._profile_enabled:
-          return self._app
-      try:
-          import cProfile as profile
-      except ImportError:
-          import profile
-      self._prof = profile.Profile()
-      def prof_wrapper(environ, start_response):
-          return self._prof.runcall(self._app, environ, start_response)
-      return prof_wrapper
+        If the FIRELOGGER_PROFILER_ENABLED header has been passed to this WSGI
+        request, the returned application will be wrapped with a profiler.
+        """
+        if not self._profile_enabled:
+            return self._app
+        try:
+            import cProfile as profile
+        except ImportError:
+            import profile
+        self._prof = profile.Profile()
+        def prof_wrapper(environ, start_response):
+            return self._prof.runcall(self._app, environ, start_response)
+        return prof_wrapper
 
     def _prepare_profile(self):
-      """Prepares profiling information."""
-      if not self._profile_enabled:
+        """Prepares profiling information."""
+        if not self._profile_enabled:
+            return None
+
+        try:
+          import gprof2dot
+        except ImportError:
+          logging.error('Unable to profile request: Could not find gprof2dot module')
           return None
 
-      try:
-        import gprof2dot
-      except ImportError:
-        logging.error('Unable to profile request: Could not find gprof2dot module')
-        return None
+        self._prof.create_stats()
+        parser = gprof2dot.PstatsParser(self._prof)
+        def get_function_name((filename, line, name)):
+            module = os.path.splitext(filename)[0]
+            module_pieces = module.split(os.path.sep)
+            return "%s:%d:%s" % ("/".join(module_pieces[-4:]), line, name)
+        parser.get_function_name = get_function_name
+        output = StringIO()
+        gprof = parser.parse()
 
-      self._prof.create_stats()
-      parser = gprof2dot.PstatsParser(self._prof)
-      def get_function_name((filename, line, name)):
-          module = os.path.splitext(filename)[0]
-          module_pieces = module.split(os.path.sep)
-          return "%s:%d:%s" % ("/".join(module_pieces[-4:]), line, name)
-      parser.get_function_name = get_function_name
-      output = StringIO()
-      gprof = parser.parse()
+        gprof.prune(0.005, 0.001)  # TODO: Parameterize node and edge thresholds.
+        dot = gprof2dot.DotWriter(output)
+        theme = gprof2dot.TEMPERATURE_COLORMAP
+        theme.bgcolor = (0.0, 0.0, 0.0)  # Use black text, for less eye-bleeding.
+        dot.graph(gprof, theme)
 
-      gprof.prune(0.005, 0.001)  # TODO: Parameterize node and edge thresholds.
-      dot = gprof2dot.DotWriter(output)
-      theme = gprof2dot.TEMPERATURE_COLORMAP
-      theme.bgcolor = (0.0, 0.0, 0.0)  # Use black text, for less eye-bleeding.
-      dot.graph(gprof, theme)
+        def get_info(self):
+            s = "Profile Graph:"
+            s += " %.3fs CPU" % self.total_tt
+            s += ": %d function calls" % self.total_calls
+            if self.total_calls != self.prim_calls:
+                s += " (%d primitive calls)" % self.prim_calls
+            return s
 
-      def get_info(self):
-          s = "Profile Graph:"
-          s += " %.3fs CPU" % self.total_tt
-          s += ": %d function calls" % self.total_calls
-          if self.total_calls != self.prim_calls:
-              s += " (%d primitive calls)" % self.prim_calls
-          return s
+        profile = {
+          "producer": "gprof2dot",
+          "producerVersion": str(gprof2dot.__version__),
+          "info": get_info(parser.stats),
+          "dot": output.getvalue(),
+        }
 
-      profile = {
-        "producer": "gprof2dot",
-        "producerVersion": str(gprof2dot.__version__),
-        "info": get_info(parser.stats),
-        "dot": output.getvalue(),
-      }
-
-      return profile
+        return profile
 
 
 class FirePythonDjango(FirePythonBase):
@@ -267,9 +279,11 @@ class FirePythonDjango(FirePythonBase):
     setting.
 
     Optional settings:
-    Set ``FIREPYTHON_PASSWORD`` setting to some password to protect your logs with password.
-    Set ``FIREPYTHON_LOGGER_NAME`` to specific logger name you want to monitor.
-    Set ``FIREPYTHON_CHECK_AGENT`` to False for prevent server to check presence of firepython in user-agent HTTP header.
+
+     - ``FIREPYTHON_PASSWORD``: password to protect your logs
+     - ``FIREPYTHON_LOGGER_NAME``: specific logger name you want to monitor
+     - ``FIREPYTHON_CHECK_AGENT``: set to False for prevent server to check
+       presence of firepython in user-agent HTTP header.
     """
 
     def __init__(self):
@@ -324,7 +338,8 @@ class FirePythonWSGI(FirePythonBase):
         if not self._check(environ):
             return self._app(environ, start_response)
 
-        closure = ["200 OK", [], None] # ask why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
+        # ask why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
+        closure = ["200 OK", [], None]
         sio = StringIO()
         def faked_start_response(_status, _headers, _exc_info=None):
             closure[0] = _status
