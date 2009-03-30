@@ -209,21 +209,19 @@ class FirePythonBase(object):
     def _finish(self):
         self._handler.finish()
 
-    def _get_app(self):
-        """Returns the WSGI app to run.
-
-        If the FIRELOGGER_PROFILER_ENABLED header has been passed to this WSGI
-        request, the returned application will be wrapped with a profiler.
-        """
+    def _profile_wrap(self, func):
+        '''If the FIRELOGGER_RESPONSE_HEADER header has been passed with a
+        request, given function will be wrapped with a profile.
+        '''
         if not self._profile_enabled:
-            return self._app
+            return func
         try:
             import cProfile as profile
         except ImportError:
             import profile
         self._prof = profile.Profile()
-        def prof_wrapper(environ, start_response):
-            return self._prof.runcall(self._app, environ, start_response)
+        def prof_wrapper(*args, **kwargs):
+            return self._prof.runcall(func, *args, **kwargs)
         return prof_wrapper
 
     def _prepare_profile(self):
@@ -302,12 +300,17 @@ class FirePythonDjango(FirePythonBase):
 
         self._start()
 
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        args = (request, ) + callback_args
+        return self._profile_wrap(callback)(*args, **callback_kwargs)
+
     def process_response(self, request, response):
         if not self._check(request.META):
             return response
 
+        profile = self._prepare_profile()
         self._finish()
-        self._flush_records(response.__setitem__)
+        self._flush_records(response.__setitem__, profile)
         return response
 
     def process_exception(self, request, exception):
@@ -353,7 +356,7 @@ class FirePythonWSGI(FirePythonBase):
         self._start()
         # run app
         try:
-            app = self._get_app()
+            app = self._profile_wrap(self._app)
             app_iter = app(environ, faked_start_response)
             output = list(app_iter)
         except Exception:
