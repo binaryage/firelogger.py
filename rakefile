@@ -158,6 +158,7 @@ task :pypi do
   dep2(File.join(ROOT, 'middleware.py'), 'firepython')
   dep2(File.join(ROOT, 'utils.py'), 'firepython')
   dep2(File.join(ROOT, 'handlers.py'), 'firepython')
+  dep2(File.join(ROOT, 'gprof2dot.py'), 'firepython')
   
   Dir.chdir(TMP) do
     system("python setup.py register") or die("register failed")
