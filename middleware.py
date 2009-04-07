@@ -43,8 +43,8 @@ class FirePythonBase(object):
     def _version_check(self, version_header):
         version = version_header.strip()
         if version == '':
-            # see http://github.com/darwin/firelogger/commit/aaeb68c4034f066e88d206b47b6e0649beadee77
-            version = '0.2'
+            logging.info('FireLogger not detected')
+            return False
         if firepython.__version__ != version:
             logging.warning('FireLogger has version %s, but FirePython part is %s',
                             version, firepython.__version__)
