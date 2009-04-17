@@ -2,7 +2,7 @@
 title: FirePython
 layout: wikistyle
 repo: http://github.com/darwin/firepython
-support: http://firelogger.uservoice.com/
+support: http://github.com/darwin/firepython/issues
 download: https://addons.mozilla.org/en-US/firefox/addon/11090
 version: Version 0.4
 ---
