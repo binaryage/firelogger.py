@@ -142,7 +142,8 @@ IRC channel [#firelogger][irc] at freenode
 
 # Articles
 
-* [FirePython — no prints?][firepython-no-prints] (by Alexander Solovyov)
+* **[FirePython — no prints?][firepython-no-prints]** by Alexander Solovyov
+* **[Realtime logging to Firebug using FirePython](http://code.google.com/appengine/articles/firepython.html)** by Antonin Hildebrand
 
 # History
 
