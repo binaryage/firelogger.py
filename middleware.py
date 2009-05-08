@@ -226,7 +226,7 @@ class FirePythonBase(object):
 
     def _prepare_profile(self):
         """Prepares profiling information."""
-        if not self._profile_enabled:
+        if not self._profile_enabled or not hasattr(self, '_prof'):
             return None
 
         try:
