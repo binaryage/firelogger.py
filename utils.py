@@ -1,5 +1,5 @@
 # -*- mode: python; coding: utf-8 -*-
-#
+
 import firepython
 
 try:
@@ -19,11 +19,11 @@ class TolerantJSONEncoder(simplejson.JSONEncoder):
 def json_encode(data):
     return simplejson.dumps(data, cls=TolerantJSONEncoder)
 
-def get_user_agent(version = firepython.__version__):
-    return "X-FirePython/"+version
-    
+def get_version_header(version = firepython.__version__):
+    return (firepython.FIRELOGGER_VERSION_HEADER, version)
+
 def get_auth_token(password):
-    return md5('#FirePythonPassword#%s#' % password).hexdigest()
-    
+    return md5('#FireLoggerPassword#%s#' % password).hexdigest()
+
 def get_auth_header(password):
-    return ("X-FirePythonAuth", get_auth_token(password))
+    return (firepython.FIRELOGGER_AUTH_HEADER, get_auth_token(password))
