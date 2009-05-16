@@ -112,6 +112,12 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 
 ## FAQ
 
+### logging.debug("hello world!") outputs nothing, what is wrong?
+> Default behavior of logging module is to output logs up from level INFO. Run "logging.getLogger().setLevel(logging.DEBUG)" to see all logs.
+
+### How can I change the name of the default logger?
+> logging.getLogger().name = "my logger"
+
 ### How can I open preferences?
 > Switch to Logger panel and look to Firebug's toolbar. There is a green bug icon. It is a menu button!
 
