@@ -81,6 +81,7 @@ Look for inspiration in [middleware.py][middleware-source]
 
   * [FirePython added to Bloog][bloog-example] (blog engine for GAE)
   * [FirePython added to DryDrop][drydrop-example] (GAE hosting engine for GitHubbers && !Pythonists)
+  * [FirePython added to Pyxer](http://code.google.com/p/pyxer/wiki/FirePython) (Python web framework)
 
 # Current State
 
@@ -140,16 +141,14 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 <a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"></a><br>
 <a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png" width="600"></a>
 
-## Bugs / Feature requests
-[The support forum is here][support].
-
 ## IRC
-IRC channel [#firelogger][irc] at freenode
+IRC channel [#binaryage][irc] at freenode
 
 # Articles
 
 * **[FirePython — no prints?][firepython-no-prints]** by Alexander Solovyov
 * **[Realtime logging to Firebug using FirePython](http://code.google.com/appengine/articles/firepython.html)** by Antonin Hildebrand
+* **[Integrating FirePython with Pyxer](http://code.google.com/p/pyxer/wiki/FirePython)** by Dirk Holtwick
 
 # History
 
@@ -188,7 +187,6 @@ IRC channel [#firelogger][irc] at freenode
 [homepage]: http://github.com/darwin/firepython
 [contact]: mailto:antonin@hildebrand.cz
 [workaround]: http://getsatisfaction.com/xrefresh/topics/unable_to_download_rainbow_for_firebug
-[support]: http://firelogger.uservoice.com/
 [firepython-no-prints]:http://blogg.ingspree.net/blog/2008/11/24/firepython-no-prints/
 [alexander]:http://github.com/piranha
 [ivan]:http://github.com/oxyum
@@ -196,7 +194,7 @@ IRC channel [#firelogger][irc] at freenode
 [antonin]:http://github.com/darwin
 [firebug-team]:http://getfirebug.com/workingGroup
 [firephp-authors]:http://www.christophdorn.com/
-[irc]:irc://irc.freenode.net/#firelogger
+[irc]:irc://irc.freenode.net/#binaryage
 [addon-homepage]: http://github.com/darwin/firepython-addon
 [middleware-source]:http://github.com/darwin/firepython/tree/master/middleware.py
 [jsonpickle]:http://code.google.com/p/jsonpickle/
