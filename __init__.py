@@ -7,7 +7,7 @@
 
 import re
 
-__version__ = '0.4'
+__version__ = '0.5'
 
 FIRELOGGER_VERSION_HEADER = 'HTTP_X_FIRELOGGER'
 FIRELOGGER_AUTH_HEADER    = 'HTTP_X_FIRELOGGERAUTH'
