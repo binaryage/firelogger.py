@@ -4,7 +4,7 @@ layout: wikistyle
 repo: http://github.com/darwin/firepython
 support: http://github.com/darwin/firepython/issues
 download: https://addons.mozilla.org/en-US/firefox/addon/11090
-version: Version 0.4
+version: Version 0.5
 ---
 
 # FirePython is a sexy Python logger console integrated into [Firebug][firebug].
@@ -85,8 +85,9 @@ Look for inspiration in [middleware.py][middleware-source]
 
 # Current State
 
-Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of changes around [Simplified Activation][activation] and API changes. Expect FireLogger 0.5 to no longer work with Firebug 1.3 and lower.
-
+  * **Version 0.5** works with:
+    * beta Firebug 1.4 + Firefox 3.0.x or Firefox 3.5
+    * does not work with Firebug 1.3 and older!
   * **Version 0.4** works with:
     * Firebug 1.3 + Firefox 3.1 
     * Firebug 1.2.1 + Firefox 3.0.4. 
@@ -132,7 +133,6 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 > Some people reported this problem too. You may [try workaround][workaround].
 
 ### How can I see Python profiling graph?
-
 > 1. enable this feature in FireLogger preferences
 > 2. setup a editor in External Editors in Firebug called "Graphviz" (the name is important!). It should be path to executable of a viewer for .dot graphs.
 > 3. reload page and you should see info log line containing profiling info, clicking on the line launches configured Graphviz viewer (a filename will be passed as the first parameter)
@@ -141,8 +141,11 @@ Unfortunately FireLogger is broken with Firebug1.4 branch. Mainly because of cha
 <a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"></a><br>
 <a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png" width="600"></a>
 
-## IRC
-IRC channel [#binaryage][irc] at freenode
+### When I start Firefox and page loads I don't see any log records, what is wrong?
+> First page content was probably loaded from cache. Refresh your page and you should be ok.
+
+### My page does multiple AJAX requests to the same URL, I see logs for the first response, but not for others. Am I missing something?
+> There is a bug in Firebug 1.4, it calls onResponse multiple times under some circumstances. That was very annoying, so I did a HACK and test for URL uniqueness in FireLogger. This will unfortunately filter out your multiple AJAX requests. Let's hope for fixes on Firebug side.
 
 # Articles
 
@@ -151,6 +154,9 @@ IRC channel [#binaryage][irc] at freenode
 * **[Integrating FirePython with Pyxer](http://code.google.com/p/pyxer/wiki/FirePython)** by Dirk Holtwick
 
 # History
+
+* v0.5 (28.06.2009)
+  * [[darwin][antonin]] compatibility with Firebug 1.4
 
 * v0.4 (30.03.2009)
   * [[bslatkin][brett]] profiling graphs for Python (WSGI)
