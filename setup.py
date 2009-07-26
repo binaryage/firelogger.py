@@ -6,12 +6,19 @@ from setuptools import setup
 try:
     from firepython import __version__
 except ImportError:
+    LINE = '*' * 78
+    print >> sys.stderr, LINE
     print >> sys.stderr, """\
+
+    NOT SO FAST:
+
         If developing firepython from the source checkout,
         one must first run `rake develop`, or simply create
         a `firepython` dir and copy all but this `setup.py`
         python module into it.
+
     """
+    print >> sys.stderr, LINE
     sys.exit(1)
 
 

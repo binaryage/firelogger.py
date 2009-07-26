@@ -4,6 +4,7 @@ build
 Thumbs.db
 *.pyc
 firepython
+dist
 firepython/dist
 firepython/firepython.egg-info
 *.egg-info
