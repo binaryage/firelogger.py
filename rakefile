@@ -181,7 +181,7 @@ end
 # Python is a hostile language for me
 # google app engine is breaking after setting sys.path (various handler caching issues and bugs)
 # witout sys.path I see no other chance than to prepare my own patched version of jsonpickle
-desc "Prepares jsonpicke version"
+desc "Prepares jsonpickle version"
 task :jsonpickle do
   repo = ARGV[1] || File.expand_path("~/code/jsonpickle-read-only")
   remove_dir(JSONPICKLE) if File.exists?(JSONPICKLE) # recursive!
