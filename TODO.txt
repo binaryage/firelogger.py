@@ -1,0 +1,11 @@
+TODO
+====
+ - convert from ``setuptools`` to ``Paver``, port all ``rakefile``` tasks to ``pavement`` tasks
+ - get the dependency stuff sorted out with regard to ``jsonpickle``
+   so that the embedding step is unnecessary
+ - add an entry point for using the middleware with ``Paste``
+ - break dependency on filesystem layout with regard to ``firelogger``,
+   possible when converting from ``rake`` to ``Paver``
+ - build and distribute docs with Sphinx
+
+.. vim:filetype=rst

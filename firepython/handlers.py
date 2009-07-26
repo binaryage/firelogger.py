@@ -2,6 +2,8 @@
 
 from logging import Handler
 
+__all__ = ['ThreadBufferedHandler']
+
 
 threading_supported = False
 try:

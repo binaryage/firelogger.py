@@ -1,45 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
-try:
-    from firepython import __version__
-except ImportError:
-    LINE = '*' * 78
-    print >> sys.stderr, LINE
-    print >> sys.stderr, """\
-
-    NOT SO FAST:
-
-        If developing firepython from the source checkout,
-        one must first run `rake develop`, or simply create
-        a `firepython` dir and copy all but this `setup.py`
-        python module into it.
-
-    """
-    print >> sys.stderr, LINE
-    sys.exit(1)
+import firepython
 
 
 SETUP_ARGS = dict(
-    name='firepython',
-    version=__version__,
+    name='FirePython',
+    version=firepython.__version__,
     description='Python logging console integrated into Firebug',
+    long_description=firepython.__doc__,
     author='Antonin Hildebrand',
     author_email='antonin@hildebrand.cz',
     url='http://firepython.binaryage.com',
-    packages=['firepython'],
-    classifiers=['Development Status :: 4 - Beta',
-                'Environment :: Web Environment',
-                'Intended Audience :: Developers',
-                'License :: OSI Approved :: BSD License',
-                'Operating System :: OS Independent',
-                'Programming Language :: Python',
-                'Topic :: Software Development :: Bug Tracking',
-                'Topic :: Software Development :: Quality Assurance',
-                'Topic :: Software Development :: Testing',
-                'Topic :: System :: Logging'],
+    packages=find_packages(exclude=['tests']),
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: Bug Tracking',
+        'Topic :: Software Development :: Quality Assurance',
+        'Topic :: Software Development :: Testing',
+        'Topic :: System :: Logging',
+    ],
+    test_suite='nose.collector',
+    include_package_data=True,
+    zip_safe=False,
 )
 
 def main():

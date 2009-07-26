@@ -1,1 +1,3 @@
-include *.txt *.md
+include *.txt rakefile *.py *.md
+recursive-include tests *.py
+recursive-include jsonpickle *.py COPYING

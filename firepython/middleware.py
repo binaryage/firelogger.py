@@ -1,26 +1,36 @@
 # -*- mode: python; coding: utf-8 -*-
 
-import base64
-import logging
 import os
 import sys
 import time
-import traceback
 import random
+import logging
+import traceback
 
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
 
-import firepython
-import firepython.utils
-from firepython.handlers import ThreadBufferedHandler
 import jsonpickle
 
+import firepython
+import firepython.utils
+import firepython.gprof2dot as gprof2dot
+from firepython.handlers import ThreadBufferedHandler
+
+__all__ = [
+    'FirePythonBase',
+    'FirePythonDjango',
+    'FirePythonWSGI',
+]
+
+
 # add a new backed jsonpickle for Django
-# jsonpickle will attempt to import this if default jsonpickle libraries are not present
-jsonpickle.load_backend('django.utils.simplejson', 'dumps', 'loads', ValueError)
+# jsonpickle will attempt to import this if default
+# jsonpickle libraries are not present
+jsonpickle.load_backend('django.utils.simplejson', 'dumps',
+                        'loads', ValueError)
 
 
 class FirePythonBase(object):
@@ -46,25 +56,30 @@ class FirePythonBase(object):
             logging.info('FireLogger not detected')
             return False
         if firepython.__version__ != version:
-            logging.warning('FireLogger has version %s, but FirePython part is %s',
-                            version, firepython.__version__)
+            logging.warning('FireLogger has version %s, but FirePython '
+                            'part is %s', version, firepython.__version__)
         return True
 
     def _password_check(self, token):
         if self._password is None:
             raise Exception("self._password must be set!")
         if not firepython.utils.get_auth_token(self._password) == token:
-            logging.warning('FireLogger password does not match. Logging output won\'t be sent to FireLogger. Double check your settings!')
+            logging.warning('FireLogger password does not match. '
+                            'Logging output won\'t be sent to FireLogger. '
+                            'Double check your settings!')
             return False
         return True
 
     def _check(self, env):
-        self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED, '') != ''
-        if (self._check_agent and
-            not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
+        self._profile_enabled = \
+            env.get(firepython.FIRELOGGER_PROFILER_ENABLED, '') != ''
+        if (self._check_agent and not
+              self._version_check(
+                env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
             return False
-        if ((self._password and
-             not self._password_check(env.get(firepython.FIRELOGGER_AUTH_HEADER, '')))):
+        if ((self._password and not
+              self._password_check(
+                env.get(firepython.FIRELOGGER_AUTH_HEADER, '')))):
             return False
         return True
 
@@ -100,15 +115,21 @@ class FirePythonBase(object):
             # __str__ implementations on various objects
             errors = [self._handle_internal_exception(e)]
             try:
-                data = jsonpickle.encode({"errors": errors }, unpicklable=False,
+                data = jsonpickle.encode({"errors": errors },
+                                         unpicklable=False,
                                          max_depth=firepython.JSONPICKLE_DEPTH)
             except Exception, e:
                 # even unable to serialize error message
                 data = jsonpickle.encode(
-                    {"errors": { "message": "FirePython has a really bad day :-(" } },
-                    unpicklable=False, max_depth=firepython.JSONPICKLE_DEPTH)
+                        {"errors": {
+                            "message": "FirePython has a really bad day :-("
+                        }
+                    },
+                    unpicklable=False,
+                    max_depth=firepython.JSONPICKLE_DEPTH
+                )
         data = data.encode('utf-8')
-        data = base64.encodestring(data)
+        data = data.encode('base64')
         return data.splitlines()
 
     def republish(self, headers):
@@ -156,8 +177,10 @@ class FirePythonBase(object):
             "message": self._handler.format(record),
             "template": record.msg,
             "timestamp": long(record.created * 1000 * 1000),
-            "time": (time.strftime("%H:%M:%S", time.localtime(record.created)) +
-                     (".%03d" % ((record.created - long(record.created)) * 1000)))
+            "time": (time.strftime("%H:%M:%S",
+                     time.localtime(record.created)) +
+                (".%03d" % ((record.created - long(record.created)) * 1000))
+            )
         }
         props = ["args", "pathname", "lineno", "exc_text", "name", "process",
                  "thread", "threadName"]
@@ -229,12 +252,6 @@ class FirePythonBase(object):
         if not self._profile_enabled or not hasattr(self, '_prof'):
             return None
 
-        try:
-          import gprof2dot
-        except ImportError:
-          logging.error('Unable to profile request: Could not find gprof2dot module')
-          return None
-
         self._prof.create_stats()
         parser = gprof2dot.PstatsParser(self._prof)
         def get_function_name((filename, line, name)):
@@ -245,10 +262,12 @@ class FirePythonBase(object):
         output = StringIO()
         gprof = parser.parse()
 
-        gprof.prune(0.005, 0.001)  # TODO: Parameterize node and edge thresholds.
+        gprof.prune(0.005, 0.001)
+                # TODO: ^--- Parameterize node and edge thresholds.
         dot = gprof2dot.DotWriter(output)
         theme = gprof2dot.TEMPERATURE_COLORMAP
-        theme.bgcolor = (0.0, 0.0, 0.0)  # Use black text, for less eye-bleeding.
+        theme.bgcolor = (0.0, 0.0, 0.0)
+                        # ^--- Use black text, for less eye-bleeding.
         dot.graph(gprof, theme)
 
         def get_info(self):
@@ -341,8 +360,7 @@ class FirePythonWSGI(FirePythonBase):
         if not self._check(environ):
             return self._app(environ, start_response)
 
-        # ask why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
-        closure = ["200 OK", [], None]
+        closure = ["200 OK", [], None]  # ask why? see `ref:pymod-counter`
         sio = StringIO()
         def faked_start_response(_status, _headers, _exc_info=None):
             closure[0] = _status
@@ -363,7 +381,8 @@ class FirePythonWSGI(FirePythonBase):
             logging.exception(sys.exc_info()[1])
             raise
         except:
-            logging.warning("DeprecationWarning: raising a string exception is deprecated")
+            logging.warning("DeprecationWarning: raising a "
+                            "string exception is deprecated")
             logging.exception(sys.exc_info()[0])
             raise
         finally:
@@ -378,3 +397,8 @@ class FirePythonWSGI(FirePythonBase):
             sio.seek(0)
             write(sio.read())
         return output
+
+
+
+# ref:pymod-counter:
+#   http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html

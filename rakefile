@@ -5,9 +5,9 @@ DST = File.join(ROOT, 'build')
 DIST_DIR = File.join(ROOT, 'dist')
 TMP = File.join(ROOT, 'tmp')
 FPY = File.join(ROOT, 'firepython')
-FPY_EGG_INFO = File.join(ROOT, 'firepython.egg-info')
+FPY_EGG_INFO = File.join(ROOT, 'FirePython.egg-info')
 JSONPICKLE = File.join(ROOT, 'jsonpickle')
-CRUFT = [DST, DIST_DIR, TMP, FPY, FPY_EGG_INFO]
+CRUFT = [DST, DIST_DIR, TMP, FPY_EGG_INFO]
 PYTHON = ROOT
 
 unless defined? OSX then
@@ -152,26 +152,10 @@ task :pypi do
   remove_dir(TMP) if File.exist?(TMP) # recursive!
 end
 
-desc "Builds the firepython package for development use"
-task :develop do
-  remove_dir(FPY) if File.exist?(FPY)
-  mkdir(FPY, {:verbose => false})
-
-  files = Dir.entries(ROOT)
-
-  files.each do |f|
-    next if (not /.+\.py/.match(f)) || /setup\.py/.match(f)
-    cp(f, File.join(FPY, f))
-  end
-
-#    cp_r(JSONPICKLE, FPY)
-  system('python setup.py develop')
-end
-
 desc "Resets version in all relevant sources"
 task :version do
   version = ARGV[1] or die("Please specify a version as first parameter")
-  init_py_path = File.join(PYTHON, '__init__.py')
+  init_py_path = File.join(FPY, '__init__.py')
   if not patch(init_py_path, /__version__ = '([0-9\.])+'/, "__version__ = '#{version}'")
     puts "  #{red("patching had no effect")}"
   end
