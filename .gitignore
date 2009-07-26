@@ -3,7 +3,9 @@ tmp
 build
 Thumbs.db
 *.pyc
+firepython
 firepython/dist
 firepython/firepython.egg-info
+*.egg-info
 MANIFEST
 _site
