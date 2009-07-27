@@ -1,34 +1,84 @@
 ---
 title: FirePython
-layout: wikistyle
+subtitle: a sexy Python logger console integrated into Firebug
+layout: product
+icon: /shared/img/firepython-icon.png
 repo: http://github.com/darwin/firepython
 support: http://github.com/darwin/firepython/issues
+downloadtitle: Install v0.5
 download: https://addons.mozilla.org/en-US/firefox/addon/11090
-version: Version 0.5
+downloadboxwidth: 210px
+donate: https://addons.mozilla.org/en-US/firefox/addons/contribute/11090?source=addon-detail
+subdownload: 
+subdownloadlink:
+mainshot: /shared/img/firepython-mainshot.png
+mainshotfull: /shared/img/firepython-mainshot-full.png
+overlaysx: 1606px
+overlaysy: 738px
+overlaycx: 25px
+overlaycy: 10px
 ---
+<div class="advertisement">
+	<div class="plug">Recommended reading:</div>
+	<a href="http://www.amazon.com/gp/product/0596009259?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596009259"><img border="0" src="/shared/img/amazon/41QbTFszYTL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596009259" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	
+	<a href="http://www.amazon.com/gp/product/0596158068?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596158068"><img border="0" src="/shared/img/amazon/41Mu5RWG-1L._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596158068" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
-# FirePython is a sexy Python logger console integrated into [Firebug][firebug].
+	<a href="http://www.amazon.com/gp/product/0596007973?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596007973"><img border="0" src="/shared/img/amazon/41S-nPeF89L._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596007973" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	
+	<a href="http://www.amazon.com/gp/product/1430210478?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=1430210478"><img border="0" src="/shared/img/amazon/516STCBRnOL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=1430210478" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	
+	<a href="http://www.amazon.com/gp/product/059652272X?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=059652272X"><img border="0" src="/shared/img/amazon/513CiT5BtYL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=059652272X" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+	
+	<div class="offer"><a href="mailto:antonin@binaryage.com">advertise here</a></div>
+</div>
+<script type="text/javascript" src="http://www.assoc-amazon.com/s/link-enhancer?tag=firepython-20&o=1">
+</script>
 
-Originally, I have created it to light up my lonely nights I was spending with [Google App Engine][appengine].
+## Features
 
-<a href="http://cloud.github.com/downloads/darwin/firelogger/FireLogger-Screenshot-v0.3.png"><img class="shadow" src="http://cloud.github.com/downloads/darwin/firelogger/FireLogger-Screenshot-v0.3.png" width="900"/></a>
+* Your logging messages are displayed right under your fingerprints in Firebug
+* Support for rich-text logging (logged objects are sent as JSON object, you may drill down their structure)
+* Support for exceptions and backtrace visualization
+* Support for profiling graphs
+* Ready as WSGI middleware and Django middleware
+* Support for advanced features:
+  * open in Text Editor integration
+  * production paths remapping
+  * password protection
+  * logging proxy support
+  * and more ...
 
-## Prerequisites
+### Compatibility
+
+* **Version 0.5** works with:
+  * beta Firebug 1.4 + Firefox 3.0.x or Firefox 3.5
+  * does not work with Firebug 1.3 and older!
+* **Version 0.4** works with:
+  * Firebug 1.3 + Firefox 3.1 
+  * Firebug 1.2.1 + Firefox 3.0.4. 
+  * does not work with Firebug 1.4 alpha!
+* **Version 0.3** works with:
+  * Firebug 1.3 + Firefox 3.1 
+  * Firebug 1.2.1 + Firefox 3.0.4. 
+* **Version 0.2** is tested to work with alpha Firebug 1.3 and Firefox 3.1.
+
+## Installation
 
 You definitely need [Firebug 1.2 or higher][firebug]. You also have to install Firefox Addon which is called [FireLogger][firelogger].
 
-## Easy Installation
+### Easy Installation
 
-### Firefox Addon
+#### Firefox Addon
 Preferred way is to [install this firefox extension][firelogger] via addons.mozilla.com.
 
-### Python Library
+#### Python Library
 
 ``sudo easy_install firepython``
 
-## Install latest version from sources (preferred)
+### Install from sources
 
-### Firefox Addon
+#### Firefox Addon
 
 If you want to install latest addon from sources, you need to build it. 
 It should be simple, but make sure you have these tools on your paths:
@@ -49,7 +99,7 @@ You should be able to install XPI file into Firefox: ``File -> Open File`` ... a
 
 Remember, that you should be also using latest FirePython library on server-side (see next section).
 
-### Python Library
+#### Python Library
 
 Just note, that it depends on simplejson (or some other json parsing library needed by [jsonpickle][jsonpickle]).
 
@@ -65,105 +115,66 @@ In case firepython directory is not on your import paths, you need to add ``rela
 
 ## Usage
 
-### Django
+#### Django
 
 After installation, enable middleware by adding its path in ``MIDDLEWARE_CLASSES``: ``firepython.middleware.FirePythonDjango``. 
 
-### WSGI compatible
+#### WSGI compatible
 
 After installation, enable middleware ``firepython.middleware.FirePythonWSGI``.
 
-### Custom usage
+#### Custom usage
 
 Look for inspiration in [middleware.py][middleware-source]
 
-## Real world examples
+### Real world examples
 
-  * [FirePython added to Bloog][bloog-example] (blog engine for GAE)
-  * [FirePython added to DryDrop][drydrop-example] (GAE hosting engine for GitHubbers && !Pythonists)
-  * [FirePython added to Pyxer](http://code.google.com/p/pyxer/wiki/FirePython) (Python web framework)
-
-# Current State
-
-  * **Version 0.5** works with:
-    * beta Firebug 1.4 + Firefox 3.0.x or Firefox 3.5
-    * does not work with Firebug 1.3 and older!
-  * **Version 0.4** works with:
-    * Firebug 1.3 + Firefox 3.1 
-    * Firebug 1.2.1 + Firefox 3.0.4. 
-    * does not work with Firebug 1.4 alpha!
-  * **Version 0.3** works with:
-    * Firebug 1.3 + Firefox 3.1 
-    * Firebug 1.2.1 + Firefox 3.0.4. 
-  * **Version 0.2** is tested to work with alpha Firebug 1.3 and Firefox 3.1.
-
-# Contributors
-
-  * **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
-  * **[Ivan Fedorov][ivan]** - helped out with threading issues.
-  * **[Brett Slatkin][brett]** - added profiling feature.
-
-### Also thanks to
-
-  * **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
-  * **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
-  * **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
-  * **[Jose Fonseca for gprof2dot library][gprof2dot]** - deep Python profiling possible
-
-# Support
+* [FirePython added to Bloog][bloog-example] (blog engine for GAE)
+* [FirePython added to DryDrop][drydrop-example] (GAE hosting engine for GitHubbers && !Pythonists)
+* [FirePython added to Pyxer](http://code.google.com/p/pyxer/wiki/FirePython) (Python web framework)
 
 ## FAQ
 
-### logging.debug("hello world!") outputs nothing, what is wrong?
+#### logging.debug("hello world!") outputs nothing, what is wrong?
 > Default behavior of logging module is to output logs up from level INFO. Run "logging.getLogger().setLevel(logging.DEBUG)" to see all logs.
 
-### How can I change the name of the default logger?
+#### How can I change the name of the default logger?
 > logging.getLogger().name = "my logger"
 
-### How can I open preferences?
-> Switch to Logger panel and look to Firebug's toolbar. There is a green bug icon. It is a menu button!
+#### How can I open preferences?
+> Switch to Logger panel and look to Firebug's toolbar. There is a green bug icon. It is a menu button! <a href="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerMenuButton.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerMenuButton.png"></a><br/><a href="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerPreferences.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerPreferences.png"></a>
 
-<a href="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerMenuButton.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerMenuButton.png"></a><br/>
-<a href="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerPreferences.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/FireLoggerPreferences.png"></a>
-
-### Clicking on source-file links in Logger panel does nothing. How can I open trace-back sources in TextMate?
+#### Clicking on source-file links in Logger panel does nothing. How can I open trace-back sources in TextMate?
 > Go to Firebug Menu -> Open With Editor -> Configure editors ... like this: ![TextMate hint][textmate-hint]
 
-### I was unable to download/install FireLogger extension from addons.mozilla.org. Can you package latest version for me?
+#### I was unable to download/install FireLogger extension from addons.mozilla.org. Can you package latest version for me?
 > Some people reported this problem too. You may [try workaround][workaround].
 
-### How can I see Python profiling graph?
+#### How can I see Python profiling graph?
 > 1. enable this feature in FireLogger preferences
 > 2. setup a editor in External Editors in Firebug called "Graphviz" (the name is important!). It should be path to executable of a viewer for .dot graphs.
 > 3. reload page and you should see info log line containing profiling info, clicking on the line launches configured Graphviz viewer (a filename will be passed as the first parameter)
-
 <a href="http://cloud.github.com/downloads/darwin/firelogger/ExternalEditorsConfiguration.png"><img src="http://cloud.github.com/downloads/darwin/firelogger/ExternalEditorsConfiguration.png"></a><br>
 <a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphLog.png"></a><br>
 <a href="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png"><img src="http://cloud.github.com/downloads/darwin/firepython/FirePython-ProfilingGraphExample.png" width="600"></a>
 
-### When I start Firefox and page loads I don't see any log records, what is wrong?
+#### When I start Firefox and page loads I don't see any log records, what is wrong?
 > First page content was probably loaded from cache. Refresh your page and you should be ok.
 
-### My page does multiple AJAX requests to the same URL, I see logs for the first response, but not for others. Am I missing something?
+#### My page does multiple AJAX requests to the same URL, I see logs for the first response, but not for others. Am I missing something?
 > There is a bug in Firebug 1.4, it calls onResponse multiple times under some circumstances. That was very annoying, so I did a HACK and test for URL uniqueness in FireLogger. This will unfortunately filter out your multiple AJAX requests. Let's hope for fixes on Firebug side.
 
-# Articles
+## History
 
-* **[FirePython — no prints?][firepython-no-prints]** by Alexander Solovyov
-* **[Realtime logging to Firebug using FirePython](http://code.google.com/appengine/articles/firepython.html)** by Antonin Hildebrand
-* **[Integrating FirePython with Pyxer](http://code.google.com/p/pyxer/wiki/FirePython)** by Dirk Holtwick
-
-# History
-
-* v0.5 (28.06.2009)
+* **v0.5** (28.06.2009)
   * [[darwin][antonin]] compatibility with Firebug 1.4
 
-* v0.4 (30.03.2009)
+* **v0.4** (30.03.2009)
   * [[bslatkin][brett]] profiling graphs for Python (WSGI)
   * [[piranha][alexander]] enabled profiling support for Django
   * [[piranha][alexander]] PEP-8 code cleanup
 
-* v0.3 (16.03.2009)
+* **v0.3** (16.03.2009)
   * [[darwin][antonin]] compatibility with Firebug 1.2
   * [[darwin][antonin]] password protection for production site
   * [[darwin][antonin]] path rewrite functionality
@@ -173,12 +184,12 @@ Look for inspiration in [middleware.py][middleware-source]
   * [[darwin][antonin]] Firefox Addon detached as a separate project FireLogger
   * [[darwin][antonin]] option for hiding internal reprs of exported objects
 
-* v0.2 (24.11.2008)
+* **v0.2** (24.11.2008)
   * [[piranha][alexander]] Django and WSGI middlewares
   * [[piranha][alexander]] added as firepython package to PyPI index
   * [[darwin][antonin]] fixed Logger panel styles when Firebug window was detached from main window
 
-* v0.1 (15.11.2008) 
+* **v0.1** (15.11.2008) 
   * [[darwin][antonin]] public alpha release
   * [[darwin][antonin]] initial server-side support for Python and Google App Engine
   * [[darwin][antonin]] communication via response headers
@@ -186,6 +197,27 @@ Look for inspiration in [middleware.py][middleware-source]
   * [[darwin][antonin]] log record filtering by type
   * [[darwin][antonin]] log record searching
   * [[darwin][antonin]] opening files in TextMate (click to timestamp field)
+
+## Links
+
+### Articles
+
+* **[Realtime logging to Firebug using FirePython](http://code.google.com/appengine/articles/firepython.html)** by Antonin Hildebrand
+* **[FirePython — no prints?][firepython-no-prints]** by Alexander Solovyov
+* **[Integrating FirePython with Pyxer](http://code.google.com/p/pyxer/wiki/FirePython)** by Dirk Holtwick
+
+### Contributors
+
+* **[Alexander Solovyov][alexander]** - python server-side library, Django and WSGI middlewares.
+* **[Ivan Fedorov][ivan]** - helped out with threading issues.
+* **[Brett Slatkin][brett]** - added profiling feature.
+
+### Also thanks to
+
+* **[Joe Hewitt, John J. Barton, Jan Odvarko and others in Firebug working group][firebug-team]** - without these guys, the web wouldn't look like today.
+* **[Christoph Dorn and FirePHP contributors][firephp-authors]** - a lot of inspiration, good work mates!
+* **[John Paulett for jsonpickle library][jsonpickle]** - I was naively developing poor man's solution for inspecting objects in Python, but hopefully googled this gem early
+* **[Jose Fonseca for gprof2dot library][gprof2dot]** - deep Python profiling possible
 
 [firebug]: https://addons.mozilla.org/en-US/firefox/addon/1843
 [appengine]: http://code.google.com/appengine
