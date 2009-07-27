@@ -9,6 +9,11 @@ import firepython.utils as FU
 import firepython._const as FC
 import firepython.middleware as FM
 
+try:
+    import gprof2dot
+except ImportError:
+    gprof2dot = None
+
 
 def test_middleware():
     app = get_app()
@@ -24,8 +29,9 @@ def test_middleware():
 
     filtered_req = app.get('/', extra_environ=get_filterable_env())
 
-    yield NT.assert_true, bool(FM.StringIO.writebuf), \
-        "filtered request writes to StringIO instance"
+    if gprof2dot:
+        yield NT.assert_true, bool(FM.StringIO.writebuf), \
+            "filtered request writes to StringIO instance"
 
     FM.StringIO = real_stringio
 
