@@ -1,11 +1,9 @@
 TODO
 ====
- - port all ``rakefile``` tasks to ``pavement`` tasks
+ - add an entry point for using the middleware with ``Paste``
  - get the dependency stuff sorted out with regard to ``jsonpickle``
    and ``gprof2dot`` so that the embedding/patching step is unnecessary
- - add an entry point for using the middleware with ``Paste``
- - break dependency on filesystem layout with regard to ``firelogger``,
-   possible when converting from ``rake`` to ``Paver``
+ - break dependency on filesystem layout with regard to ``firelogger``
  - build and distribute docs with Sphinx
 
 .. vim:filetype=rst
