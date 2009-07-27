@@ -8,6 +8,9 @@ IMPORT_MODS = [
     'firepython.handlers',
     'firepython._const',
     'firepython._setup_common',
+    'firepython.demo',
+    'firepython.demo.app',
+    'firepython.demo._body',
 ]
 
 

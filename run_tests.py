@@ -11,6 +11,8 @@ FPY_MODS = [
     'firepython.middleware',
     'firepython.handlers',
     'firepython._const',
+    'firepython.demo.app',
+    'firepython.demo._body',
 ]
 SYSARGS = ['nosetests']
 EXT_ARGS = sys.argv[1:]
@@ -31,6 +33,7 @@ if W_ITESTS:
 def main():
     if not TESTS in NOSE_ARGV:
         NOSE_ARGV.append(TESTS)
+    print '----> ' + ' '.join(NOSE_ARGV)
     return nose.main(argv=NOSE_ARGV)
 
 
