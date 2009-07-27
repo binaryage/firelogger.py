@@ -13,6 +13,7 @@ ADDON = ROOT.parent/'firelogger'
 # ^--- firelogger is expected to be at same directory
 #      level as firepython project
 FIREFOX = ADDON/'firefox'
+INSTALL_RDF = FIREFOX/'install.rdf'
 BUILD_DIR = ROOT/'build'
 DIST_DIR = ROOT/'dist'
 FPY = ROOT/'firepython'
@@ -24,7 +25,8 @@ CRUFT = [
     ROOT/'paver-minilib.zip',
 ]
 API_VERSION = re.compile(r'<em:version>([^<]*)<\/em:version>')
-PY_API_VERSION_DEF = '^__api_version__ = [\'"]([^\']+)[\'"]$'
+PY_API_VERSION_DEF_RE = re.compile('__api_version__ = [\'"][^\'"]+[\'"]')
+PY_API_VERSION_DEF = '__api_version__ = \'%s\''
 
 
 SETUP_ARGS['packages'] = find_packages(exclude=['tests'])
@@ -32,13 +34,12 @@ setup(**SETUP_ARGS)
 
 
 def get_version_from_install_rdf():
-    install_rdf = FIREFOX/'install.rdf'
-    match = API_VERSION.search(install_rdf.bytes())
+    match = API_VERSION.search(INSTALL_RDF.bytes())
     if match:
-        return match.groups(1).strip()
+        return match.groups(1)[0].strip()
     else:
         raise Exception('failed to API determine version from %s'
-                        % install_rdf)
+                        % INSTALL_RDF)
 
 
 @task
@@ -61,12 +62,15 @@ def pypi():
 @task
 def update_api_version():
     """Resets API version in the firepython package base"""
-    raise NotImplementedError
+    assert INSTALL_RDF.exists(), \
+        "%s not found!, cannot extract version." % INSTALL_RDF
 
     ver = get_version_from_install_rdf()
+    info('found API version %r from %s' % (ver, INSTALL_RDF))
     init = FPY/'__init__.py'
     old_bytes = init.bytes()
-    new_bytes = PY_API_VERSION_DEF.sub(ver, old_bytes)
+    ver_string = PY_API_VERSION_DEF % ver
+    new_bytes = PY_API_VERSION_DEF_RE.sub(ver_string, old_bytes)
     if old_bytes != new_bytes:
         init.write_bytes(new_bytes)
     else:
@@ -84,9 +88,7 @@ def clean():
 
 
 @task
-@needs(['minilib',
-#         'update_api_version',
-        'distutils.command.sdist'])
+@needs(['update_api_version', 'minilib', 'distutils.command.sdist'])
 def sdist():
     """Combines paver minilib with setuptools' sdist"""
     pass
