@@ -2,7 +2,7 @@ import sys
 import optparse
 from wsgiref.simple_server import make_server
 
-from firepython.demo.app import FirePythonDemoApp
+from firepython.demo.app import FirePythonDemoApp, LOGGER_NAME
 from firepython.middleware import FirePythonWSGI
 
 USAGE = """%prog [options]
@@ -21,6 +21,10 @@ OPTIONS = (
         dict(dest='password', action='store', default=None,
              help='password to use for the password protection feature, '
                   'if desired.')),
+    (('-X', '--no-check-agent'),
+        dict(dest='no_check_agent', action='store_true', default=False,
+             help='force *no* checking of User Agent (more permissive), '
+                  'default=False')),
 )
 
 
@@ -30,13 +34,15 @@ def main(sysargs=sys.argv[:]):
         parser.add_option(*args, **kwargs)
     opts = parser.parse_args(sysargs[1:])[0]
     return serve_demo(host=opts.host, port=opts.port,
-                      password=opts.password)
+                      password=opts.password,
+                      check_agent=(not opts.no_check_agent))
 
 
 def serve_demo(host=DEFAULT_HOST, port=DEFAULT_PORT,
-               password=None):
+               password=None, check_agent=True):
     app = demo_app = FirePythonDemoApp({})
-    app = FirePythonWSGI(app, password=password, logger_name=__name__)
+    app = FirePythonWSGI(app, password=password, logger_name=LOGGER_NAME,
+                         check_agent=check_agent)
     server = make_server(host, port, app)
 
     try:

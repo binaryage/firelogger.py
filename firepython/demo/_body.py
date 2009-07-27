@@ -17,21 +17,11 @@ BODY_HEADER = """\
             class="twitter" src="__BASE__/shared/img/twitter.png"
             title="Follow us on Twitter"></a>
     </div>
-<!--    <div class="header-menu-wrapper span-16 last">
-        <ul class="header-menu">
-            <li><a href="http://www.binaryage.com">about</a></li>
-            <li><a href="http://www.binaryage.com">products</a></li>
--->
-            <!-- <li><a href="http://blog.binaryage.com">blog</a></li> -->
-<!--
-        </ul>
-    </div>
--->
 </div>
 </div>
 """
 BODY = """\
-<!DOCTYPE html><!-- html5 darnit!!! -->
+<!DOCTYPE html>
 <html>
   <head>
     <title>FirePython demo app</title>
@@ -65,7 +55,8 @@ BODY = """\
               <strong>QUERY_STRING</strong> to see some output in
               the firebug <strong>Logger</strong> panel.
           </p>
-          <h2 id='environ-header'>environ:</h2>
+          <h2 id='environ-header'><abbr
+            title='partial environ, that is'>environ:</abbr></h2>
           <pre id='environ'>%(environ)s</pre>
         </div>
       </div>

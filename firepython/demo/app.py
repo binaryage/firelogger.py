@@ -1,31 +1,52 @@
 import random
+import urllib
 import logging
 from xml.sax import saxutils
 from wsgiref.util import setup_testing_defaults
 
 from firepython.demo._body import BODY, EXCLAMATIONS
 
+LOGGER_NAME = __name__
+
 
 class FirePythonDemoApp(object):
+    _did_setup_logging = False
 
-    def __init__(self, global_config):
+    def __init__(self, global_config=None):
+        if not global_config:
+            global_config = {}
         self.global_config = global_config
-        self.log = logging.getLogger(__name__)
         self.__body__ = BODY
+        self.log = logging.getLogger(LOGGER_NAME)
+
+    def _setup_logging(self):
+        if self._did_setup_logging:
+            return
+
+        self.log.setLevel(logging.DEBUG)
+
+        for handler in self.log.root.handlers + self.log.handlers:
+            handler.setLevel(logging.DEBUG)
+
+        self._did_setup_logging = True
 
     def __call__(self, environ, start_response):
+        self._setup_logging()
         if 'error' in environ.get('QUERY_STRING', '').lower():
             try:
                 busted = 10000 / 0
             except Exception:
                 self.log.exception('OMG you cannot has division by zero!: ')
+                self.log.error('and if you continue to WANT, will be ERROR')
+                self.log.warn('I am givin you dis warning!')
         else:
             self.log.info('Nothing to see here, folks')
+            self.log.debug('for serious ... is nothing')
 
         start_response('200 OK', [('content-type', 'text/html')])
         body = self.__body__ % dict(
                 environ='\n' + self._get_pretty_environ(environ),
-                error=random.choice(EXCLAMATIONS)
+                error=urllib.quote(random.choice(EXCLAMATIONS)),
         )
         return [body]
 
