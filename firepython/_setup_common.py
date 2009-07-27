@@ -28,4 +28,9 @@ SETUP_ARGS = dict(
     },
     test_suite='nose.collector',
     zip_safe=True,
+    entry_points={
+        'console_scripts': [
+            'firepython-demo-app = firepython.demo:main',
+        ],
+    }
 )
