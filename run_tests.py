@@ -4,6 +4,8 @@ import os
 import sys
 import nose
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+TESTS = os.path.join(HERE, 'tests')
 FPY_MODS = [
     'firepython.utils',
     'firepython.middleware',
@@ -27,6 +29,8 @@ if W_ITESTS:
 
 
 def main():
+    if not TESTS in NOSE_ARGV:
+        NOSE_ARGV.append(TESTS)
     return nose.main(argv=NOSE_ARGV)
 
 

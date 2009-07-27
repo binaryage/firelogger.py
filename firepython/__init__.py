@@ -4,10 +4,11 @@
 #
 # for usage see readme.md or http://github.com/darwin/firepython
 #
-from firepython._const import *
-
 __all__ = [
+    '__api_version__',
     '__version__',
 ]
 
-__version__ = '0.5'
+__api_version__ = '0.5'
+# ^--- corresponds to api version of firelogger
+__version__ = '0.6.0'   # for python package releases

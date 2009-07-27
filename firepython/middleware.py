@@ -14,9 +14,14 @@ except ImportError:
 
 import jsonpickle
 
+try:
+    import gprof2dot
+except ImportError:
+    gprof2dot = None
+
 import firepython
 import firepython.utils
-import firepython.gprof2dot as gprof2dot
+import firepython._const as CONST
 from firepython.handlers import ThreadBufferedHandler
 
 __all__ = [
@@ -51,14 +56,19 @@ class FirePythonBase(object):
         self._handler = None
 
     def _version_check(self, version_header):
-        version = version_header.strip()
-        if version == '':
+        firelogger_api_version = version_header.strip()
+        if firelogger_api_version == '':
             logging.info('FireLogger not detected')
             return False
-        if firepython.__version__ != version:
-            self._client_message += ('Warning: FireLogger (client) has version %s, but FirePython (server) is %s. ' % (version, firepython.__version__))
-            logging.warning('FireLogger (client) has version %s, but FirePython (server) is %s',
-                            version, firepython.__version__)
+        if firepython.__api_version__ != firelogger_api_version:
+            self._client_message += (
+                'Warning: FireLogger (client) has version %s, but '
+                'FirePython (server) is %s. ' % (firelogger_api_version,
+                                                 firepython.__api_version__)
+            )
+            logging.warning('FireLogger has version %s, but FirePython '
+                            '(server) is version %s', firelogger_api_version,
+                            firepython.__api_version__)
         return True
 
     def _password_check(self, token):
@@ -88,14 +98,17 @@ class FirePythonBase(object):
 
     def _check(self, env):
         self._client_message = ''
-        self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED_HEADER, '') != ''
-        self._appstats_enabled = env.get(firepython.FIRELOGGER_APPSTATS_ENABLED_HEADER, '') != ''
-        if (self._check_agent and
-            not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
+        self._appstats_enabled = \
+            env.get(firepython.FIRELOGGER_APPSTATS_ENABLED_HEADER, '') != ''
+        self._profile_enabled = \
+            env.get(CONST.FIRELOGGER_PROFILER_ENABLED, '') != ''
+        if (self._check_agent and not
+              self._version_check(
+                env.get(CONST.FIRELOGGER_VERSION_HEADER, ''))):
             return False
         if ((self._password and not
               self._password_check(
-                env.get(firepython.FIRELOGGER_AUTH_HEADER, '')))):
+                env.get(CONST.FIRELOGGER_AUTH_HEADER, '')))):
             return False
         # If _password is set, skip _appengine_check()
         if (not self._password and not self._appengine_check()):
@@ -113,7 +126,7 @@ class FirePythonBase(object):
         return (exc_type, exc_value, exc_traceback)
 
     def _handle_internal_exception(self, e):
-        if firepython.RAZOR_MODE: # in razor mode hurt web server
+        if CONST.RAZOR_MODE: # in razor mode hurt web server
             raise e
         # in non-razor mode report internal error to firepython addon
         exc_info = self._sanitize_exc_info(sys.exc_info())
@@ -130,7 +143,7 @@ class FirePythonBase(object):
             data['extension_data'] = extension_data
         try:
             data = jsonpickle.encode(data, unpicklable=False,
-                                     max_depth=firepython.JSONPICKLE_DEPTH)
+                                     max_depth=CONST.JSONPICKLE_DEPTH)
         except Exception, e:
             # this exception may be fired, because of buggy __repr__ or
             # __str__ implementations on various objects
@@ -138,7 +151,7 @@ class FirePythonBase(object):
             try:
                 data = jsonpickle.encode({"errors": errors },
                                          unpicklable=False,
-                                         max_depth=firepython.JSONPICKLE_DEPTH)
+                                         max_depth=CONST.JSONPICKLE_DEPTH)
             except Exception, e:
                 # even unable to serialize error message
                 data = jsonpickle.encode(
@@ -147,7 +160,7 @@ class FirePythonBase(object):
                         }
                     },
                     unpicklable=False,
-                    max_depth=firepython.JSONPICKLE_DEPTH
+                    max_depth=CONST.JSONPICKLE_DEPTH
                 )
         data = data.encode('utf-8')
         data = data.encode('base64')
@@ -156,7 +169,7 @@ class FirePythonBase(object):
     def republish(self, headers):
         firelogger_headers = []
         for key, value in headers.iteritems():
-            if firepython.FIRELOGGER_RESPONSE_HEADER.match(key):
+            if CONST.FIRELOGGER_RESPONSE_HEADER.match(key):
                 firelogger_headers.append((key, value))
 
         self._handler.republish(firelogger_headers)
@@ -222,7 +235,7 @@ class FirePythonBase(object):
                     try:
                         d = {}
                         for k,v in t.tb_frame.f_locals.iteritems():
-                            if firepython.DEEP_LOCALS:
+                            if CONST.DEEP_LOCALS:
                                 d[unicode(k)] = v
                             else:
                                 d[unicode(k)] = repr(v)
@@ -273,12 +286,18 @@ class FirePythonBase(object):
         if not self._profile_enabled or not hasattr(self, '_prof'):
             return None
 
+        if not gprof2dot:
+            logging.warn('failed to import ``gprof2dot``, will not profile')
+            return None
+
         self._prof.create_stats()
         parser = gprof2dot.PstatsParser(self._prof)
+
         def get_function_name((filename, line, name)):
             module = os.path.splitext(filename)[0]
             module_pieces = module.split(os.path.sep)
             return "%s:%d:%s" % ("/".join(module_pieces[-4:]), line, name)
+
         parser.get_function_name = get_function_name
         output = StringIO()
         gprof = parser.parse()
@@ -393,7 +412,7 @@ class FirePythonWSGI(FirePythonBase):
         # firepython is enabled or we have a client message we want to communicate in headers
         client_message = self._client_message
 
-        # asking why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
+        # asking why? see __ref_pymod_counter__
         closure = ["200 OK", [], None]
         extension_data = {}  # Collect extension data here
         sio = StringIO()
@@ -416,18 +435,22 @@ class FirePythonWSGI(FirePythonBase):
             
         # run app
         try:
-            if check: 
-                app = self._profile_wrap(self._app)
-            app_iter = app(environ, faked_start_response)
-            output = list(app_iter)
-        except Exception:
-            logging.exception(sys.exc_info()[1])
-            raise
-        except:
-            logging.warning("DeprecationWarning: raising a "
-                            "string exception is deprecated")
-            logging.exception(sys.exc_info()[0])
-            raise
+            # the nested try-except block within
+            # a try-finally block is so that we stay
+            # python2.3 compatible
+            try:
+                if check:
+                    app = self._profile_wrap(self._app)
+                app_iter = app(environ, faked_start_response)
+                output = list(app_iter)
+            except Exception:
+                logging.exception(sys.exc_info()[1])
+                raise
+            except:
+                logging.warning("DeprecationWarning: raising a "
+                                "string exception is deprecated")
+                logging.exception(sys.exc_info()[0])
+                raise
         finally:
             # Output the profile first, so we can see any errors in profiling.
             if check: 
@@ -444,5 +467,5 @@ class FirePythonWSGI(FirePythonBase):
 
 
 
-# ref:pymod-counter:
-#   http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
+__ref_pymod_counter__ = \
+"http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html"

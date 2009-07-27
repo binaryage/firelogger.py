@@ -1,6 +1,6 @@
 # -*- mode: python; coding: utf-8 -*-
 import sys
-from firepython import __version__
+from firepython import __api_version__
 import firepython._const as CONST
 
 
@@ -35,7 +35,7 @@ def json_encode(data):
     return json.dumps(data, cls=TolerantJSONEncoder)
 
 
-def get_version_header(version=__version__):
+def get_version_header(version=__api_version__):
     return (CONST.FIRELOGGER_VERSION_HEADER, version)
 
 

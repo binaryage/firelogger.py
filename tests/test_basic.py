@@ -6,8 +6,8 @@ IMPORT_MODS = [
     'firepython.utils',
     'firepython.middleware',
     'firepython.handlers',
-    'firepython.gprof2dot',
     'firepython._const',
+    'firepython._setup_common',
 ]
 
 

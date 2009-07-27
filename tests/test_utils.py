@@ -1,7 +1,7 @@
 import nose.tools as NT
 import mock
 
-import firepython as FPY
+import firepython._const as CONST
 import firepython.utils as FU
 
 
@@ -34,5 +34,5 @@ def test_get_auth_token():
     yield NT.assert_equal, EXPECTED_AUTH_TOK, ret
 
 
-EXPECTED_VERSION_HEADER = (FPY.FIRELOGGER_VERSION_HEADER, 'bork')
+EXPECTED_VERSION_HEADER = (CONST.FIRELOGGER_VERSION_HEADER, 'bork')
 EXPECTED_AUTH_TOK = 'c5d00db3f939c1cc523f57d67e5cc319'
