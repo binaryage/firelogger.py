@@ -18,6 +18,7 @@ overlaysy: 738px
 overlaycx: 25px
 overlaycy: 10px
 ---
+
 <div class="advertisement">
 	<div class="plug">Recommended reading:</div>
 	<a href="http://www.amazon.com/gp/product/0596009259?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596009259"><img border="0" src="/shared/img/amazon/41QbTFszYTL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596009259" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
