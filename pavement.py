@@ -92,3 +92,32 @@ def clean():
 def sdist():
     """Combines paver minilib with setuptools' sdist"""
     pass
+
+
+_TESTS_INSTALL_PKG = """\
+    Tests require `%(mod)s`.
+    Please `easy_install` or `pip install` the `%(pkg)s` package'
+"""
+
+@task
+def _pretest_check():
+    had_fail = False
+
+    for mod, pkg in (('mock', 'Mock'), ('webtest', 'WebTest')):
+        try:
+            import mock
+        except ImportError:
+            info(_TESTS_INSTALL_PKG % dict(mod=mod, pkg=pkg))
+            had_fail = True
+
+    if had_fail:
+        raise ImportError
+
+
+@task
+@needs(['_pretest_check', 'setuptools.command.test'])
+def test():
+    """make sure we have test dependencies, possibly alert user
+    about what to do to resolve, then run setuptools' `test`
+    """
+    pass
