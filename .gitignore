@@ -7,3 +7,5 @@ firepython/dist
 firepython/firepython.egg-info
 MANIFEST
 _site
+_layouts
+shared
