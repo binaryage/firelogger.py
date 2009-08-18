@@ -5,7 +5,7 @@ layout: product
 icon: /shared/img/firepython-icon.png
 repo: http://github.com/darwin/firepython
 support: http://github.com/darwin/firepython/issues
-downloadtitle: Install v0.5
+downloadtitle: Install v0.6
 download: https://addons.mozilla.org/en-US/firefox/addon/11090
 downloadboxwidth: 210px
 donate: https://addons.mozilla.org/en-US/firefox/addons/contribute/11090?source=addon-detail
@@ -49,9 +49,14 @@ overlaycy: 10px
   * password protection
   * logging proxy support
   * and more ...
+  
+### Checkout also [FireLogger for PHP](http://firelogger4php.binaryage.com)
 
 ### Compatibility
 
+* **Version 0.6** works with:
+  * alpha Firebug 1.5 + Firefox 3.5
+  * Firebug 1.4.2 + Firefox 3.5
 * **Version 0.5** works with:
   * beta Firebug 1.4 + Firefox 3.0.x or Firefox 3.5
   * does not work with Firebug 1.3 and older!
@@ -66,7 +71,7 @@ overlaycy: 10px
 
 ## Installation
 
-You definitely need [Firebug 1.2 or higher][firebug]. You also have to install Firefox Addon which is called [FireLogger][firelogger].
+You definitely need [Firebug 1.4 or higher][firebug]. You also have to install Firefox Addon which is called [FireLogger][firelogger].
 
 ### Easy Installation
 
@@ -139,6 +144,12 @@ Look for inspiration in [middleware.py][middleware-source]
 #### logging.debug("hello world!") outputs nothing, what is wrong?
 > Default behavior of logging module is to output logs up from level INFO. Run "logging.getLogger().setLevel(logging.DEBUG)" to see all logs.
 
+#### Is there something similar for PHP?
+> Check out [FireLogger for PHP](http://firelogger4php.binaryage.com), you may also want to checkout alternative logging tool [FirePHP](http://firephp.org)
+
+#### Is there something similar for Ruby?
+> Nope. I'd like to have one, but didn't find time to write server-side support. You are welcome to [hack it](http://wiki.github.com/darwin/firelogger)!
+
 #### How can I change the name of the default logger?
 > logging.getLogger().name = "my logger"
 
@@ -166,6 +177,13 @@ Look for inspiration in [middleware.py][middleware-source]
 > There is a bug in Firebug 1.4, it calls onResponse multiple times under some circumstances. That was very annoying, so I did a HACK and test for URL uniqueness in FireLogger. This will unfortunately filter out your multiple AJAX requests. Let's hope for fixes on Firebug side.
 
 ## History
+
+* **v0.6** (28.06.2009)
+  * [[darwin][antonin]] support for PHP (http://firelogger4php.binaryage.com)
+  * [[darwin][antonin]] fixed bug when warning about disabled console and net panel was not displayed
+  * [[darwin][antonin]] fixed broken "Open in external editor" functionality (FB1.5)
+  * [[darwin][antonin]] compatibility with FB1.4.2
+  * [[darwin][antonin]] compatibility with alpha FB1.5
 
 * **v0.5** (28.06.2009)
   * [[darwin][antonin]] compatibility with Firebug 1.4
