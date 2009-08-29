@@ -1,8 +1,7 @@
 TODO
 ====
  - add an entry point for using the middleware with ``Paste``
- - get the dependency stuff sorted out with regard to ``jsonpickle``
-   and ``gprof2dot`` so that the embedding/patching step is unnecessary
+ - introduce some form of i18n
  - break dependency on filesystem layout with regard to ``firelogger``
  - build and distribute docs with Sphinx
 
