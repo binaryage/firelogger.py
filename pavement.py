@@ -38,14 +38,14 @@ def get_version_from_install_rdf():
     if match:
         return match.groups(1)[0].strip()
     else:
-        raise Exception('failed to API determine version from %s'
+        raise Exception('failed to determine API version from %s'
                         % INSTALL_RDF)
 
 
 @task
 def xpi():
     """Prepare XPI"""
-    assert ADDON.exists(), "firepython-addon not found!\n  " \
+    assert ADDON.exists(), "firelogger addon not found!\n  " \
                            "expected to be in %s" % ADDON
     os.chdir(ADDON)
     sh('rake')
