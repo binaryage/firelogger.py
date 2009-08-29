@@ -17,3 +17,5 @@ def test_mini_graphviz():
 
     md5sum = md5(open(out_png).read()).hexdigest()
     yield NT.assert_equal, EXPECTED_MD5SUM, md5sum
+
+    os.remove(out_png)
