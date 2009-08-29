@@ -10,6 +10,7 @@ SETUP_ARGS = dict(
     author_email='antonin@hildebrand.cz',
     url='http://firepython.binaryage.com',
     packages=['firepython'],
+    py_modules=['gprof2dot'], #XXX remove when easy_install-able
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
@@ -23,9 +24,6 @@ SETUP_ARGS = dict(
         'Topic :: System :: Logging',
     ],
     install_requires=['jsonpickle'],
-    extras_require={
-        'gprof2dot': ['gprof2dot'],
-    },
     license='BSD',
     platforms=['any'],
     test_suite='nose.collector',
@@ -33,6 +31,7 @@ SETUP_ARGS = dict(
     entry_points={
         'console_scripts': [
             'firepython-demo-app = firepython.demo:main',
+            'firepython-graphviz = firepython.mini_graphviz:main',
         ],
         'paste.filter_factory': [
             'main = firepython.middleware:paste_filter_factory',
