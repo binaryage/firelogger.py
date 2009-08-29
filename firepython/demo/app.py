@@ -37,8 +37,11 @@ class FirePythonDemoApp(object):
                 busted = 10000 / 0
             except Exception:
                 self.log.exception('OMG you cannot has division by zero!: ')
+                self.log.critical('It is because the Zero cannot be divided!')
                 self.log.error('and if you continue to WANT, will be ERROR')
                 self.log.warn('I am givin you dis warning!')
+                self.log.info('It is for your information')
+                self.log.debug('While this is just a bonus')
         else:
             self.log.info('Nothing to see here, folks')
             self.log.debug('for serious ... is nothing')
