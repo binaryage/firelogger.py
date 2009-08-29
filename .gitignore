@@ -9,3 +9,4 @@ build
 dist
 shared
 tmp
+paver-minilib.zip
