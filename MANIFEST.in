@@ -1,3 +1,2 @@
-include *.txt rakefile *.py *.md paver-minilib.zip
+include *.txt *.py *.md paver-minilib.zip
 recursive-include tests *.py
-recursive-include jsonpickle *.py COPYING
