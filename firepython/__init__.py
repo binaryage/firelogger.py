@@ -1,9 +1,12 @@
 # -*- mode: python; coding: utf-8 -*-
-#
-# FireLogger server-side support library for Python
-#
-# for usage see readme.md or http://github.com/darwin/firepython
-#
+"""
+FireLogger_ server-side support library for Python.
+For usage see README.md or visit the homepage_.
+
+.. _FireLogger: https://addons.mozilla.org/en-US/firefox/addon/11090
+.. _homepage: http://github.com/darwin/firepython
+"""
+
 __all__ = [
     '__api_version__',
     '__version__',
