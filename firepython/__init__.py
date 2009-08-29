@@ -9,6 +9,6 @@ __all__ = [
     '__version__',
 ]
 
-__api_version__ = '0.5'
+__api_version__ = '0.7'
 # ^--- corresponds to api version of firelogger
 __version__ = '0.6.0'   # for python package releases
