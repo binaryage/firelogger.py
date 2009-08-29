@@ -441,8 +441,9 @@ class FirePythonWSGI(FirePythonBase):
             # a try-finally block is so that we stay
             # python2.3 compatible
             try:
+                app = self.app
                 if check:
-                    app = self._profile_wrap(self._app)
+                    app = self._profile_wrap(app)
                 app_iter = app(environ, faked_start_response)
                 # output = list(app_iter) #XXX THIS IS PROBABLY NOT A GOOD IDEA
                                           #XXX AS IT CONSUMES THE FULL RESPONSE

@@ -36,5 +36,8 @@ SETUP_ARGS = dict(
         'paste.filter_factory': [
             'main = firepython.middleware:paste_filter_factory',
         ],
+        'paste.filter_factory': [
+            'main = firepython.middleware:paste_filter_factory',
+        ],
     }
 )
