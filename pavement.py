@@ -8,7 +8,7 @@ from paver.setuputils import setup, find_packages
 
 from firepython._setup_common import SETUP_ARGS
 
-ROOT = path('.').abspath()
+ROOT = path.getcwd()
 ADDON = ROOT.parent/'firelogger'
 # ^--- firelogger is expected to be at same directory
 #      level as firepython project
@@ -121,3 +121,24 @@ def test():
     about what to do to resolve, then run setuptools' `test`
     """
     pass
+
+
+@task
+def testall():
+    """run *all* of the tests (requires nose)"""
+    try:
+        import nose
+    except ImportError:
+        info(_TESTS_INSTALL_PKG % dict(mod='nose', pkg='nose'))
+        raise
+
+    args = [
+        'nosetests',
+        '-i',
+        '^itest',
+        ROOT/'tests',
+        '--with-coverage',
+        '--cover-package',
+        'firepython',
+    ]
+    nose.run(argv=args)
