@@ -1,2 +1,2 @@
-include *.txt *.py *.md paver-minilib.zip
+include *.txt *.py paver-minilib.zip
 recursive-include tests *.py
