@@ -26,6 +26,8 @@ SETUP_ARGS = dict(
     extras_require={
         'gprof2dot': ['gprof2dot'],
     },
+    license='BSD',
+    platforms=['any'],
     test_suite='nose.collector',
     zip_safe=True,
     entry_points={
