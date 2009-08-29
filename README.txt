@@ -1,7 +1,8 @@
-# FirePython
+FirePython
+==========
 
 FirePython is a sexy Python logger console integrated into Firebug.
+Visit `firepython.binaryage.com`_.
 
-<a href="http://firepython.binaryage.com"><img src="http://firepython.binaryage.com/shared/img/firepython-mainshot.png"></a>
-
-## Visit [firepython.binaryage.com](http://firepython.binaryage.com)
+.. _firepython.binaryage.com: http://firepython.binaryage.com
+.. vim:filetype=rst
