@@ -2,7 +2,7 @@ from StringIO import StringIO
 import nose.tools as NT
 
 from wsgiref.simple_server import demo_app
-from webtest import TestApp
+from paste.fixture import TestApp
 
 import firepython as FPY
 import firepython.utils as FU

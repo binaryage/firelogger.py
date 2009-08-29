@@ -34,5 +34,8 @@ SETUP_ARGS = dict(
         'console_scripts': [
             'firepython-demo-app = firepython.demo:main',
         ],
+        'paste.filter_factory': [
+            'main = firepython.middleware:paste_filter_factory',
+        ],
     }
 )

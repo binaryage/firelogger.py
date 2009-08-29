@@ -28,6 +28,7 @@ __all__ = [
     'FirePythonBase',
     'FirePythonDjango',
     'FirePythonWSGI',
+    'paste_filter_factory',
 ]
 
 
@@ -116,7 +117,7 @@ class FirePythonBase(object):
         return True
 
     def _sanitize_exc_info(self, exc_info):
-        if exc_info==None:
+        if exc_info == None:
             return ("?", "No exception info available", [])
         exc_type = exc_info[0]
         exc_value = exc_info[1]
@@ -201,9 +202,10 @@ class FirePythonBase(object):
                 errors.append(self._handle_internal_exception(e))
 
         chunks = self._encode(logs, errors, profile, extension_data)
-        guid = "%08x" % random.randint(0,0xFFFFFFFF)
+        guid = "%08x" % random.randint(0, 0xFFFFFFFF)
         for i, chunk in enumerate(chunks):
-            add_header('FireLogger-%s-%d' % (guid, i), chunk)
+            add_header(CONST.FIRELOGGER_HEADER_FORMAT %
+                       dict(guid=guid, identity=i), chunk)
 
     def _prepare_log_record(self, record):
         data = {
@@ -395,7 +397,7 @@ class FirePythonWSGI(FirePythonBase):
     protection. Also logger name may be specified.
     """
     def __init__(self, app, password=None, logger_name=None, check_agent=True):
-        self._app = app
+        self.app = app
         self._password = password
         self._logger_name = logger_name
         self._check_agent = check_agent
@@ -442,7 +444,8 @@ class FirePythonWSGI(FirePythonBase):
                 if check:
                     app = self._profile_wrap(self._app)
                 app_iter = app(environ, faked_start_response)
-                output = list(app_iter)
+                # output = list(app_iter) #XXX THIS IS PROBABLY NOT A GOOD IDEA
+                                          #XXX AS IT CONSUMES THE FULL RESPONSE
             except Exception:
                 logging.exception(sys.exc_info()[1])
                 raise
@@ -463,8 +466,25 @@ class FirePythonWSGI(FirePythonBase):
         if sio.tell(): # position is not 0
             sio.seek(0)
             write(sio.read())
-        return output
+        # return output
+        return app_iter
 
+
+def paste_filter_factory(global_conf, password_file='', logger_name='',
+                         check_agent='true'):
+    from paste.deploy.converters import asbool
+
+    check_agent = asbool(check_agent)
+    get_password = lambda: ''
+    if password_file:
+        def get_password():
+            return open(password_file).read().strip()
+
+    def with_firepython_middleware(app):
+        return FirePythonWSGI(app, password=get_password(),
+                              logger_name=logger_name,
+                              check_agent=check_agent)
+    return with_firepython_middleware
 
 
 __ref_pymod_counter__ = \
