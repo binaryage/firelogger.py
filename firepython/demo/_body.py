@@ -13,9 +13,8 @@ BODY_HEADER = """\
     <div class="header-left span-8">
         <a href="http://www.binaryage.com"
             title="Binary Age"><div class="header-logo"></div></a>
-        <a href="http://twitter.com/binaryage"><img
-            class="twitter" src="__BASE__/shared/img/twitter.png"
-            title="Follow us on Twitter"></a>
+        <a href="http://twitter.com/binaryage"><div
+            class="twitter" title="Follow us on Twitter"></div></a>
     </div>
 </div>
 </div>
