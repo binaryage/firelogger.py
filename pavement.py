@@ -136,6 +136,7 @@ def testall():
         'nosetests',
         '-i',
         '^itest',
+        '-v',
         ROOT/'tests',
         '--with-coverage',
         '--cover-package',
