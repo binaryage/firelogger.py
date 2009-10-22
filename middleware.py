@@ -71,7 +71,7 @@ class FirePythonBase(object):
         return users.is_current_user_admin()
 
     def _check(self, env):
-        self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED, '') != ''
+        self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED_HEADER, '') != ''
         if (self._check_agent and
             not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
             return False
