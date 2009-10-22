@@ -72,6 +72,7 @@ class FirePythonBase(object):
 
     def _check(self, env):
         self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED_HEADER, '') != ''
+        self._appstats_enabled = env.get(firepython.FIRELOGGER_APPSTATS_ENABLED_HEADER, '') != ''
         if (self._check_agent and
             not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
             return False
@@ -318,6 +319,8 @@ class FirePythonDjango(FirePythonBase):
         self._start()
         # Make set_extension_data available via the request object.
         self._extension_data = {}
+        if self._appstats_enabled:
+            request.firepython_appstats_enabled = True
         request.firepython_set_extension_data = self._extension_data.__setitem__
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
@@ -373,6 +376,9 @@ class FirePythonWSGI(FirePythonBase):
 
         def add_header(name, value):
             closure[1].append((name, value))
+
+        if self._appstats_enabled:
+            environ['firepython.appstats_enabled'] = True
 
         self._start()
         environ['firepython.set_extension_data'] = extension_data.__setitem__
