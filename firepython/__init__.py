@@ -7,11 +7,6 @@ For usage see ``README.txt`` or visit the `github homepage`_.
 .. _github homepage: http://github.com/darwin/firepython
 """
 
-__all__ = [
-    '__api_version__',
-    '__version__',
-]
-
 __api_version__ = '0.7'
 # ^--- corresponds to api version of firelogger
 __version__ = '0.6.0'   # for python package releases
