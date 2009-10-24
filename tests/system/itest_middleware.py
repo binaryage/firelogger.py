@@ -44,7 +44,7 @@ def get_app():
 
 def get_filterable_env():
     env = {}
-    env[FC.FIRELOGGER_PROFILER_ENABLED] = 'yes'
+    env[FC.FIRELOGGER_PROFILER_ENABLED_HEADER] = 'yes'
     env[FC.FIRELOGGER_VERSION_HEADER] = FPY.__api_version__
     env[FC.FIRELOGGER_AUTH_HEADER] = FU.get_auth_token('snarf')
     return env
