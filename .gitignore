@@ -3,7 +3,9 @@
 .DS_Store
 .coverage
 Thumbs.db
+_layouts
 _site
 build
 dist
+shared
 tmp

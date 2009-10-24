@@ -56,30 +56,49 @@ class FirePythonBase(object):
             logging.info('FireLogger not detected')
             return False
         if firepython.__version__ != version:
-            logging.warning('FireLogger has version %s, but FirePython '
-                            'part is %s', version, firepython.__version__)
+            self._client_message += ('Warning: FireLogger (client) has version %s, but FirePython (server) is %s. ' % (version, firepython.__version__))
+            logging.warning('FireLogger (client) has version %s, but FirePython (server) is %s',
+                            version, firepython.__version__)
         return True
 
     def _password_check(self, token):
         if self._password is None:
             raise Exception("self._password must be set!")
         if not firepython.utils.get_auth_token(self._password) == token:
-            logging.warning('FireLogger password does not match. '
-                            'Logging output won\'t be sent to FireLogger. '
-                            'Double check your settings!')
+            self._client_message += 'FireLogger password does not match. '
+            logging.warning('FireLogger password does not match. Logging output won\'t be sent to FireLogger. Double check your settings!')
+            return False
+        return True
+
+    def _appengine_check(self):
+        if 'google.appengine' not in sys.modules:
+            return True  # Definitely not running under Google App Engine
+        try:
+            from google.appengine.api import users
+        except ImportError:
+            return True  # Apparently not running under Google App Engine
+        if os.getenv('SERVER_SOFTWARE', '').startswith('Dev'):
+            return True  # Running in SDK dev_appserver
+        # Running in production, only allow admin users
+        if not users.is_current_user_admin():
+            self._client_message += 'Security: Log in as a project administrator to see FirePython logs (App Engine in production mode). '
+            logging.warning('Security: Log in as a project administrator to see FirePython logs (App Engine in production mode)')
             return False
         return True
 
     def _check(self, env):
-        self._profile_enabled = \
-            env.get(firepython.FIRELOGGER_PROFILER_ENABLED, '') != ''
-        if (self._check_agent and not
-              self._version_check(
-                env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
+        self._client_message = ''
+        self._profile_enabled = env.get(firepython.FIRELOGGER_PROFILER_ENABLED_HEADER, '') != ''
+        self._appstats_enabled = env.get(firepython.FIRELOGGER_APPSTATS_ENABLED_HEADER, '') != ''
+        if (self._check_agent and
+            not self._version_check(env.get(firepython.FIRELOGGER_VERSION_HEADER, ''))):
             return False
         if ((self._password and not
               self._password_check(
                 env.get(firepython.FIRELOGGER_AUTH_HEADER, '')))):
+            return False
+        # If _password is set, skip _appengine_check()
+        if (not self._password and not self._appengine_check()):
             return False
         return True
 
@@ -101,12 +120,14 @@ class FirePythonBase(object):
         return {"message": "Internal FirePython error: %s" % unicode(e),
                 "exc_info": exc_info}
 
-    def _encode(self, logs, errors=None, profile=None):
-        data = {"logs": logs }
+    def _encode(self, logs, errors=None, profile=None, extension_data=None):
+        data = {"logs": logs}
         if errors:
             data['errors'] = errors
         if profile:
             data['profile'] = profile
+        if extension_data:
+            data['extension_data'] = extension_data
         try:
             data = jsonpickle.encode(data, unpicklable=False,
                                      max_depth=firepython.JSONPICKLE_DEPTH)
@@ -140,7 +161,7 @@ class FirePythonBase(object):
 
         self._handler.republish(firelogger_headers)
 
-    def _flush_records(self, add_header, profile=None):
+    def _flush_records(self, add_header, profile=None, extension_data=None):
         """
         Flush collected logs into response.
 
@@ -166,7 +187,7 @@ class FirePythonBase(object):
                 # __str__ implementations on various objects
                 errors.append(self._handle_internal_exception(e))
 
-        chunks = self._encode(logs, errors, profile)
+        chunks = self._encode(logs, errors, profile, extension_data)
         guid = "%08x" % random.randint(0,0xFFFFFFFF)
         for i, chunk in enumerate(chunks):
             add_header('FireLogger-%s-%d' % (guid, i), chunk)
@@ -292,8 +313,8 @@ class FirePythonDjango(FirePythonBase):
     """
     Django middleware to enable FirePython logging.
 
-    To use add 'firepython.django.FirePythonDjango' to your MIDDLEWARE_CLASSES
-    setting.
+    To use add 'firepython.middleware.FirePythonDjango' to your
+    MIDDLEWARE_CLASSES setting.
 
     Optional settings:
 
@@ -318,18 +339,26 @@ class FirePythonDjango(FirePythonBase):
             return
 
         self._start()
+        # Make set_extension_data available via the request object.
+        self._extension_data = {}
+        if self._appstats_enabled:
+            request.firepython_appstats_enabled = True
+        request.firepython_set_extension_data = self._extension_data.__setitem__
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
         args = (request, ) + callback_args
         return self._profile_wrap(callback)(*args, **callback_kwargs)
 
     def process_response(self, request, response):
-        if not self._check(request.META):
+        check = self._check(request.META)
+        if self._client_message:
+            response.__setitem__(firepython.FIRELOGGER_MESSAGE_HEADER, self._client_message)
+        if not check:
             return response
-
+            
         profile = self._prepare_profile()
         self._finish()
-        self._flush_records(response.__setitem__, profile)
+        self._flush_records(response.__setitem__, profile, self._extension_data)
         return response
 
     def process_exception(self, request, exception):
@@ -357,24 +386,38 @@ class FirePythonWSGI(FirePythonBase):
         self.uninstall_handler()
 
     def __call__(self, environ, start_response):
-        if not self._check(environ):
-            return self._app(environ, start_response)
+        check = self._check(environ)
+        if not check and not self._client_message:
+            return self._app(environ, start_response) # a quick path
 
-        closure = ["200 OK", [], None]  # ask why? see `ref:pymod-counter`
+        # firepython is enabled or we have a client message we want to communicate in headers
+        client_message = self._client_message
+
+        # asking why? http://jjinux.blogspot.com/2006/10/python-modifying-counter-in-closure.html
+        closure = ["200 OK", [], None]
+        extension_data = {}  # Collect extension data here
         sio = StringIO()
         def faked_start_response(_status, _headers, _exc_info=None):
             closure[0] = _status
             closure[1] = _headers
             closure[2] = _exc_info
+            if client_message: closure[1].append((firepython.FIRELOGGER_MESSAGE_HEADER, client_message))
             return sio.write
 
         def add_header(name, value):
             closure[1].append((name, value))
 
-        self._start()
+        if self._appstats_enabled:
+            environ['firepython.appstats_enabled'] = True
+            
+        if check: 
+            self._start()
+            environ['firepython.set_extension_data'] = extension_data.__setitem__
+            
         # run app
         try:
-            app = self._profile_wrap(self._app)
+            if check: 
+                app = self._profile_wrap(self._app)
             app_iter = app(environ, faked_start_response)
             output = list(app_iter)
         except Exception:
@@ -387,9 +430,10 @@ class FirePythonWSGI(FirePythonBase):
             raise
         finally:
             # Output the profile first, so we can see any errors in profiling.
-            profile = self._prepare_profile()
-            self._finish()
-            self._flush_records(add_header, profile)
+            if check: 
+                profile = self._prepare_profile()
+                self._finish()
+                self._flush_records(add_header, profile, extension_data)
 
         # start responding
         write = start_response(*closure)
