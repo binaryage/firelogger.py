@@ -99,13 +99,12 @@ class FirePythonBase(object):
 
     def _check(self, env):
         self._client_message = ''
-        self._appstats_enabled = \
-            env.get(firepython.FIRELOGGER_APPSTATS_ENABLED_HEADER, '') != ''
         self._profile_enabled = \
-            env.get(CONST.FIRELOGGER_PROFILER_ENABLED, '') != ''
-        if (self._check_agent and not
-              self._version_check(
-                env.get(CONST.FIRELOGGER_VERSION_HEADER, ''))):
+            env.get(CONST.FIRELOGGER_PROFILER_ENABLED_HEADER, '') != ''
+        self._appstats_enabled = \
+            env.get(CONST.FIRELOGGER_APPSTATS_ENABLED_HEADER, '') != ''
+        if self._check_agent and not self._version_check(
+            env.get(CONST.FIRELOGGER_VERSION_HEADER, '')):
             return False
         if ((self._password and not
               self._password_check(
@@ -373,7 +372,8 @@ class FirePythonDjango(FirePythonBase):
     def process_response(self, request, response):
         check = self._check(request.META)
         if self._client_message:
-            response.__setitem__(firepython.FIRELOGGER_MESSAGE_HEADER, self._client_message)
+            response.__setitem__(CONST.FIRELOGGER_MESSAGE_HEADER,
+                                 self._client_message)
         if not check:
             return response
             
@@ -409,7 +409,7 @@ class FirePythonWSGI(FirePythonBase):
     def __call__(self, environ, start_response):
         check = self._check(environ)
         if not check and not self._client_message:
-            return self._app(environ, start_response) # a quick path
+            return self.app(environ, start_response) # a quick path
 
         # firepython is enabled or we have a client message we want to communicate in headers
         client_message = self._client_message
@@ -422,7 +422,9 @@ class FirePythonWSGI(FirePythonBase):
             closure[0] = _status
             closure[1] = _headers
             closure[2] = _exc_info
-            if client_message: closure[1].append((firepython.FIRELOGGER_MESSAGE_HEADER, client_message))
+            if client_message:
+                closure[1].append(
+                    (CONST.FIRELOGGER_MESSAGE_HEADER, client_message))
             return sio.write
 
         def add_header(name, value):
