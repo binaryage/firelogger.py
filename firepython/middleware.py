@@ -447,8 +447,7 @@ class FirePythonWSGI(FirePythonBase):
                 if check:
                     app = self._profile_wrap(app)
                 app_iter = app(environ, faked_start_response)
-                # output = list(app_iter) #XXX THIS IS PROBABLY NOT A GOOD IDEA
-                                          #XXX AS IT CONSUMES THE FULL RESPONSE
+                output = list(app_iter) # this must be here for Google App Engine (it probably consumes the full response)
             except Exception:
                 logging.exception(sys.exc_info()[1])
                 raise
