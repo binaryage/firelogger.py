@@ -469,7 +469,7 @@ class FirePythonWSGI(FirePythonBase):
             sio.seek(0)
             write(sio.read())
         # return output
-        return app_iter
+        return output
 
 
 def paste_filter_factory(global_conf, password_file='', logger_name='',
