@@ -1,0 +1,55 @@
+Testing
+~~~~~~~
+
+Be sure to install Paver before doing any development or testing.::
+
+    easy_install Paver
+
+    # or:
+
+    pip install Paver
+
+
+Also, make sure that ``FirePython`` is either "developed" or installed.::
+
+    paver develop
+
+    # or:
+
+    paver install
+
+
+Running tests with Paver
+++++++++++++++++++++++++
+
+While invoking ``nosetests`` from the project base directory will
+run the unit tests, you'll probably want to run all integration tests
+as well.  The ``pavement.py`` file includes a ``testall`` task for
+doing exactly that.::
+
+    paver testall
+
+
+Optional dependencies
++++++++++++++++++++++
+
+The ``FirePython`` WSGI middleware may be used with ``Paste``.  If you
+have ``Paste`` and ``PasteDeploy`` installed, the ``testall`` task
+**should** run the paste integration test.
+
+If running tests on Linux, the integration test for the mini graphviz
+helper script should run, but will fail if either the ``dot`` or ``eog``
+binaries is not present in the ``$PATH``.  Invoking the ``firepython-graphviz``
+script with the ``--help`` flag should be "helpful".
+
+
+Demo Application
+++++++++++++++++
+
+Invoking the ``firepython-demo-app`` will start up a server running the demo
+application, indicating port number in the stdout.  If the demo application
+fails for any reason, it most likely indicates a missing dependency.  Please
+be sure to save any Tracebacks for inclusion when reporting issues on github.
+
+
+.. vim:filetype=rst
