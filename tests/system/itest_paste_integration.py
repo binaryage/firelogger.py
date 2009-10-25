@@ -1,7 +1,13 @@
 import os
 
+from nose import SkipTest
 import nose.tools as NT
-from paste.fixture import TestApp
+
+try:
+    from paste.fixture import TestApp
+    from paste.deploy import loadapp
+except ImportError:
+    TestApp = loadapp = None
 
 import firepython as FP
 import firepython._const as FPC
@@ -17,6 +23,12 @@ INI = os.path.join(HERE, 'test.ini')
 
 
 def test_paste_integration():
+    if None in (TestApp, loadapp):
+        def raiser(exc, msg):
+            raise exc(msg)
+        yield raiser, SkipTest, 'incomplete Paste dependencies, so ' \
+                                'not testing Paste integration'
+        raise StopIteration
     app = get_app()
     clean_response = app.get('/')
     yield NT.assert_true, bool(clean_response.body)
