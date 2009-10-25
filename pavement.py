@@ -6,10 +6,11 @@ import sys
 from paver.easy import *
 from paver.setuputils import setup, find_packages
 
-sys.path.insert(0, path.getcwd()) # use firepython from current folder
+ROOT = path.getcwd()
+sys.path.insert(0, ROOT) # use firepython from current folder
+
 from firepython._setup_common import SETUP_ARGS
 
-ROOT = path.getcwd()
 ADDON = ROOT.parent/'firelogger'
 # ^--- firelogger is expected to be at same directory
 #      level as firepython project
