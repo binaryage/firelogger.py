@@ -6,6 +6,7 @@ import sys
 from paver.easy import *
 from paver.setuputils import setup, find_packages
 
+sys.path.insert(0, path.getcwd()) # use firepython from current folder
 from firepython._setup_common import SETUP_ARGS
 
 ROOT = path.getcwd()
