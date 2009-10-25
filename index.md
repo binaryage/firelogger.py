@@ -11,5 +11,3 @@ layout: nil
     Redirecting to <a href="http://firelogger.binaryage.com">http://firelogger.binaryage.com</a> ...
 </body>
 </html>
-
-
