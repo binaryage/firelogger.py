@@ -1,11 +1,11 @@
 ---
-title: FirePython
-subtitle: a sexy Python logger console integrated into Firebug
+title: FireLogger
+subtitle: a sexy logger console integrated into Firebug
 layout: product
 icon: /shared/img/firepython-icon.png
-repo: http://github.com/darwin/firepython
-support: http://github.com/darwin/firepython/issues
-downloadtitle: Install v0.6
+repo: http://github.com/darwin/firelogger
+support: http://github.com/darwin/firelogger/issues
+downloadtitle: Install v0.7
 download: https://addons.mozilla.org/en-US/firefox/addon/11090
 downloadboxwidth: 210px
 donate: https://addons.mozilla.org/en-US/firefox/addons/contribute/11090?source=addon-detail
@@ -20,21 +20,11 @@ overlaycy: 10px
 ---
 
 <div class="advertisement">
-	<div class="plug">Recommended reading:</div>
-	<a href="http://www.amazon.com/gp/product/0596009259?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596009259"><img border="0" src="/shared/img/amazon/41QbTFszYTL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596009259" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-	
-	<a href="http://www.amazon.com/gp/product/0596158068?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596158068"><img border="0" src="/shared/img/amazon/41Mu5RWG-1L._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596158068" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-
-	<a href="http://www.amazon.com/gp/product/0596007973?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=0596007973"><img border="0" src="/shared/img/amazon/41S-nPeF89L._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=0596007973" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-	
-	<a href="http://www.amazon.com/gp/product/1430210478?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=1430210478"><img border="0" src="/shared/img/amazon/516STCBRnOL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=1430210478" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-	
-	<a href="http://www.amazon.com/gp/product/059652272X?ie=UTF8&tag=firepython-20&linkCode=as2&camp=1789&creative=9325&creativeASIN=059652272X"><img border="0" src="/shared/img/amazon/513CiT5BtYL._SL110_.jpg"></a><img src="http://www.assoc-amazon.com/e/ir?t=firepython-20&l=as2&o=1&a=059652272X" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-	
-	<div class="offer"><a href="mailto:antonin@binaryage.com">advertise here</a></div>
+    <ul class="header-menu python">
+        <li><a class="menu-item-python" href="/">python</a></li>
+        <li><a class="menu-item-php" href="/php">php</a></li>
+    </ul>
 </div>
-<script type="text/javascript" src="http://www.assoc-amazon.com/s/link-enhancer?tag=firepython-20&o=1">
-</script>
 
 ## Features
 
@@ -49,8 +39,6 @@ overlaycy: 10px
   * password protection
   * logging proxy support
   * and more ...
-  
-### Checkout also [FireLogger for PHP](http://firelogger4php.binaryage.com)
 
 ### Compatibility
 
