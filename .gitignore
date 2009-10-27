@@ -10,3 +10,5 @@ dist
 shared
 tmp
 paver-minilib.zip
+jsonpickle-*
+simplejson-*
