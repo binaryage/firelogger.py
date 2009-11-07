@@ -38,27 +38,6 @@ __all__ = [
 jsonpickle.load_backend('django.utils.simplejson', 'dumps',
                         'loads', ValueError)
 
-
-class output_wrapper(object):
-    '''output_wrapper is used to catch exceptions from WSGI applications
-    without iterating whole response before returning output.
-    '''
-    def __init__(self, app_iter):
-        self.iter = app_iter
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        try:
-            return self.iter.next()
-        except Exception, e:
-            if isinstance(e, StopIteration):
-                raise
-            logging.exception(sys.exc_info()[1])
-            raise
-
-
 class FirePythonBase(object):
 
     def __init__(self):
@@ -467,7 +446,7 @@ class FirePythonWSGI(FirePythonBase):
                 if check:
                     app = self._profile_wrap(app)
                 app_iter = app(environ, faked_start_response)
-                output = output_wrapper(app_iter)
+                output = list(app_iter)
             except:
                 logging.warning("DeprecationWarning: raising a "
                                 "string exception is deprecated")
