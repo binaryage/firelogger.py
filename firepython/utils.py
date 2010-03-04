@@ -11,18 +11,18 @@ __all__ = [
     'get_auth_header',
 ]
 
-if sys.version_info[:2] >= (2, 6):
+try:
     import json
-else:
+except ImportError:
     try:
         import simplejson as json
     except ImportError:
         from django.utils import simplejson as json
 
-if sys.version_info[:2] <= (2, 3):
-    from md5 import md5
-else:
+try:
     from hashlib import md5
+except ImportError:
+    from md5 import md5
 
 
 class TolerantJSONEncoder(json.JSONEncoder):

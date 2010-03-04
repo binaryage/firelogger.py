@@ -23,11 +23,11 @@ def paver_main():
 
 
 def main():
-    if sys.version_info[:2] <= (2, 3):
-        return python23_compat_main()
-    else:
+    try:
+        import paver
         return paver_main()
-
+    except ImportError:
+        return python23_compat_main()
 
 if __name__ == '__main__':
     sys.exit(main())
