@@ -2,7 +2,6 @@ TODO
 ====
  - introduce some form of i18n
  - add some end-to-end tests using either ``windmill`` or ``selenium``
- - break dependency on filesystem layout with regard to ``firelogger``
  - build and distribute docs with Sphinx
 
 .. vim:filetype=rst

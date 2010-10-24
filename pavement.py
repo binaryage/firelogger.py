@@ -11,11 +11,6 @@ sys.path.insert(0, ROOT) # use firepython from current folder
 
 from firepython._setup_common import SETUP_ARGS
 
-ADDON = ROOT.parent/'firelogger'
-# ^--- firelogger is expected to be at same directory
-#      level as firepython project
-FIREFOX = ADDON/'firefox'
-INSTALL_RDF = FIREFOX/'install.rdf'
 BUILD_DIR = ROOT/'build'
 DIST_DIR = ROOT/'dist'
 FPY = ROOT/'firepython'
@@ -42,15 +37,6 @@ def get_version_from_install_rdf():
     else:
         raise Exception('failed to determine API version from %s'
                         % INSTALL_RDF)
-
-
-@task
-def xpi():
-    """Prepare XPI"""
-    assert ADDON.exists(), "firelogger addon not found!\n  " \
-                           "expected to be in %s" % ADDON
-    os.chdir(ADDON)
-    sh('rake')
 
 
 @task
