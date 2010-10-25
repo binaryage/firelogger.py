@@ -42,6 +42,21 @@ helper script should run, but will fail if either the ``dot`` or ``eog``
 binaries is not present in the ``$PATH``.  Invoking the ``firepython-graphviz``
 script with the ``--help`` flag should be "helpful".
 
+Notes for Mac
++++++++++++++
+
+I'm using OS X 10.6, Python 2.7 (via brew). With clean install I needed to:
+
+    pip install nose
+    pip install paste
+    pip install coverage
+    pip install mock
+    brew install graphviz
+
+then:
+    paver testall
+
+it passes without failures
 
 Demo Application
 ++++++++++++++++
