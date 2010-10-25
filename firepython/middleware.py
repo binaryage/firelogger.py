@@ -63,11 +63,11 @@ class FirePythonBase(object):
         if firepython.__api_version__ != firelogger_api_version:
             self._client_message += (
                 'Warning: FireLogger (client) has version %s, but '
-                'FirePython (server) is %s. ' % (firelogger_api_version,
+                'FirePython (server) is version %s. Check http://firelogger.binaryage.com for latest version.' % (firelogger_api_version,
                                                  firepython.__api_version__)
             )
-            logging.warning('FireLogger has version %s, but FirePython '
-                            '(server) is version %s', firelogger_api_version,
+            logging.warning('FireLogger (client) has version %s, but FirePython '
+                            '(server) is version %s. Check http://firelogger.binaryage.com for latest version.', firelogger_api_version,
                             firepython.__api_version__)
         return True
 
