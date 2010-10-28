@@ -345,6 +345,7 @@ class FirePythonDjango(FirePythonBase):
 
     def __init__(self):
         from django.conf import settings
+        self._extension_data = {}
         self._password = getattr(settings, 'FIREPYTHON_PASSWORD', None)
         self._logger_name = getattr(settings, 'FIREPYTHON_LOGGER_NAME', None)
         self._check_agent = getattr(settings, 'FIREPYTHON_CHECK_AGENT', True)
@@ -359,7 +360,6 @@ class FirePythonDjango(FirePythonBase):
 
         self._start()
         # Make set_extension_data available via the request object.
-        self._extension_data = {}
         if self._appstats_enabled:
             request.firepython_appstats_enabled = True
         request.firepython_set_extension_data = self._extension_data.__setitem__
