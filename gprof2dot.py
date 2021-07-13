@@ -320,7 +320,7 @@ class Profile(Object):
                     call[CALL_RATIO] = ratio(call[event], total)
 
     def integrate(self, outevent, inevent):
-        """Propagate function time ratio allong the function calls.
+        """Propagate function time ratio along the function calls.
 
         Must be called after finding the cycles.
 
@@ -510,7 +510,7 @@ class Profile(Object):
             except UndefinedEvent:
                 pass
 
-        # prune the egdes
+        # prune the edges
         for function in self.functions.itervalues():
             for callee_id in function.calls.keys():
                 call = function.calls[callee_id]
@@ -1633,13 +1633,13 @@ class Theme:
 
 TEMPERATURE_COLORMAP = Theme(
     mincolor = (2.0/3.0, 0.80, 0.25), # dark blue
-    maxcolor = (0.0, 1.0, 0.5), # satured red
+    maxcolor = (0.0, 1.0, 0.5), # saturated red
     gamma = 1.0
 )
 
 PINK_COLORMAP = Theme(
     mincolor = (0.0, 1.0, 0.90), # pink
-    maxcolor = (0.0, 1.0, 0.5), # satured red
+    maxcolor = (0.0, 1.0, 0.5), # saturated red
 )
 
 GRAY_COLORMAP = Theme(
